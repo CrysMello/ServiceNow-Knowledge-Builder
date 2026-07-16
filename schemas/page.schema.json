@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicenow-knowledge-builder/schemas/page.schema.json",
+  "title": "pages/<page_id>.json",
+  "description": "Single page artifact (SRS section 10.4).",
+  "type": "object",
+  "required": [
+    "schema_version", "page_id", "revision_id", "name_original", "title",
+    "url_sanitized", "fingerprint", "first_seen", "elements", "screenshots",
+    "messages", "limitations", "metadata"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "page_id": { "type": "string", "format": "uuid" },
+    "revision_id": { "type": "integer", "minimum": 1 },
+    "name_original": { "type": "string" },
+    "name_reviewed": { "type": ["string", "null"] },
+    "title": { "type": "string" },
+    "url_sanitized": { "type": "string" },
+    "route": { "type": ["string", "null"] },
+    "frame_tree": { "type": "array" },
+    "fingerprint": { "type": "string" },
+    "first_seen": { "type": "string", "format": "date-time" },
+    "last_seen": { "type": ["string", "null"], "format": "date-time" },
+    "parent_context": { "type": ["string", "null"] },
+    "elements": { "type": "array" },
+    "screenshots": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+    "messages": { "type": "array" },
+    "limitations": { "type": "array", "items": { "type": "string" } },
+    "metadata": { "type": "object" }
+  },
+  "additionalProperties": false
+}

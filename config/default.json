@@ -1,0 +1,22 @@
+{
+  "$comment": "Default configuration snapshot matching snkb.shared.dtos.app_config.AppConfig. Copy to config/local.json (gitignored) and fill in instance_url/output_directory for a real environment. CFG-002: defaults are the safest option.",
+  "instance_url": "https://CHANGE-ME.service-now.com",
+  "output_directory": "exports",
+  "browser_timeout_seconds": 30.0,
+  "headless": false,
+  "resolution_width": 1920,
+  "resolution_height": 1080,
+  "user_agent": null,
+  "downloads_enabled": false,
+  "language": "pt-BR",
+  "log_level": "info",
+  "log_retention_days": 30,
+  "max_journal_loss_seconds": 10.0,
+  "capture_policy": {
+    "capture_field_values": false,
+    "mask_sensitive_fields": true,
+    "capture_screenshots": true,
+    "full_page_screenshots": false,
+    "capture_authenticated_user": false
+  }
+}

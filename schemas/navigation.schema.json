@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicenow-knowledge-builder/schemas/navigation.schema.json",
+  "title": "navigation.json",
+  "description": "Navigation graph and timeline artifact (SRS section 10.3).",
+  "type": "object",
+  "required": ["schema_version", "session_id", "nodes", "edges", "timeline"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "session_id": { "type": "string", "format": "uuid" },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["page_id", "title", "url"],
+        "properties": {
+          "page_id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_page_id", "target_page_id", "event_id",
+          "relation_type", "confidence", "timestamp"
+        ],
+        "properties": {
+          "source_page_id": { "type": "string", "format": "uuid" },
+          "target_page_id": { "type": "string", "format": "uuid" },
+          "event_id": { "type": "string", "format": "uuid" },
+          "relation_type": {
+            "type": "string",
+            "enum": ["observed", "inferred", "manual"]
+          },
+          "confidence": { "type": "integer", "minimum": 0, "maximum": 100 },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "evidence": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "timeline": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["sequence", "timestamp", "event_id", "page_id"],
+        "properties": {
+          "sequence": { "type": "integer", "minimum": 0 },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "event_id": { "type": "string", "format": "uuid" },
+          "page_id": { "type": "string", "format": "uuid" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

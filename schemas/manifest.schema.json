@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicenow-knowledge-builder/schemas/manifest.schema.json",
+  "title": "manifest.json",
+  "description": "Export inventory with checksums (SRS section 10.6, RNF-020).",
+  "type": "object",
+  "required": ["schema_version", "session_id", "generator", "created_at", "files"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "session_id": { "type": "string", "format": "uuid" },
+    "generator": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "size_bytes", "sha256", "content_type"],
+        "properties": {
+          "path": { "type": "string" },
+          "size_bytes": { "type": "integer", "minimum": 0 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "content_type": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicenow-knowledge-builder/schemas/screenshots.schema.json",
+  "title": "screenshots.json",
+  "description": "Per-page screenshot metadata (Module Specifications 8.22).",
+  "type": "object",
+  "required": ["schema_version", "session_id", "page_id", "screenshots"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "session_id": { "type": "string", "format": "uuid" },
+    "page_id": { "type": "string", "format": "uuid" },
+    "screenshots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "file", "type", "timestamp", "width", "height"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "file": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["full_page", "viewport", "modal", "popup", "element", "region"]
+          },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "width": { "type": "integer", "exclusiveMinimum": 0 },
+          "height": { "type": "integer", "exclusiveMinimum": 0 }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

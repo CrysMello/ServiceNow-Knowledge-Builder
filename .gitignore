@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Playwright
+.playwright/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project runtime artifacts (never versioned per RS-010, RS-003)
+exports/*
+!exports/.gitkeep
+logs/*
+!logs/.gitkeep
+
+# Local configuration overrides (never commit real instance/secrets)
+config/local.*
+.env

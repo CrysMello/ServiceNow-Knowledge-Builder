@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicenow-knowledge-builder/schemas/session.schema.json",
+  "title": "session.json",
+  "description": "Session metadata artifact (SRS section 10.2).",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "recording_id",
+    "instance_url",
+    "recording_start",
+    "status",
+    "browser",
+    "browser_version",
+    "operating_system",
+    "screen_resolution",
+    "viewport",
+    "warnings"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "recording_id": { "type": "string", "format": "uuid" },
+    "instance_url": { "type": "string" },
+    "instance_name": { "type": ["string", "null"] },
+    "home_title": { "type": ["string", "null"] },
+    "recording_start": { "type": "string", "format": "date-time" },
+    "recording_end": { "type": ["string", "null"], "format": "date-time" },
+    "duration_seconds": { "type": ["number", "null"] },
+    "status": {
+      "type": "string",
+      "enum": [
+        "created", "preparing", "waiting_authentication", "ready",
+        "recording", "paused", "finalizing", "completed",
+        "completed_with_warnings", "interrupted", "failed", "recovered"
+      ]
+    },
+    "service_now_version": { "type": ["string", "null"] },
+    "service_now_version_source": { "type": ["string", "null"] },
+    "language": { "type": ["string", "null"] },
+    "locale": { "type": ["string", "null"] },
+    "timezone": { "type": ["string", "null"] },
+    "browser": { "type": "string" },
+    "browser_version": { "type": "string" },
+    "operating_system": { "type": "string" },
+    "screen_resolution": {
+      "type": "object",
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "integer", "exclusiveMinimum": 0 },
+        "height": { "type": "integer", "exclusiveMinimum": 0 }
+      }
+    },
+    "viewport": {
+      "type": "object",
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "integer", "exclusiveMinimum": 0 },
+        "height": { "type": "integer", "exclusiveMinimum": 0 }
+      }
+    },
+    "device_scale_factor": { "type": ["number", "null"] },
+    "zoom": { "type": ["number", "null"] },
+    "theme": { "type": ["string", "null"] },
+    "authenticated_user": { "type": ["string", "null"] },
+    "configuration_snapshot": { "type": "object" },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

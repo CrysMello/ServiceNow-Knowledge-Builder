@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicenow-knowledge-builder/schemas/selectors.schema.json",
+  "title": "selectors.json",
+  "description": "Consolidated selector catalog (SRS section 10.5, RF-030).",
+  "type": "object",
+  "required": ["schema_version", "session_id", "elements"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "session_id": { "type": "string", "format": "uuid" },
+    "elements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["page_id", "element_id", "fallback_strategies"],
+        "properties": {
+          "page_id": { "type": "string", "format": "uuid" },
+          "element_id": { "type": "string", "format": "uuid" },
+          "best_strategy": { "$ref": "#/$defs/candidate" },
+          "fallback_strategies": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/candidate" }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "candidate": {
+      "type": "object",
+      "required": ["strategy", "value", "confidence_score", "stability_score"],
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "id", "data_testid", "name", "aria_label", "role", "css",
+            "xpath_relative", "xpath_absolute"
+          ]
+        },
+        "value": { "type": "string" },
+        "uniqueness_count": { "type": ["integer", "null"] },
+        "confidence_score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "stability_score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "validated_at": { "type": ["string", "null"], "format": "date-time" },
+        "notes": { "type": ["string", "null"] }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,13 @@
+"""Exceptions raised by the Screenshot Engine (Module Specifications 8.18)."""
+
+from __future__ import annotations
+
+from snkb.domain.exceptions.base import KnowledgeBuilderError
+
+
+class ScreenshotCaptureError(KnowledgeBuilderError):
+    """Raised when a capture attempt fails or produces a corrupted file."""
+
+
+class InsufficientDiskSpaceError(KnowledgeBuilderError):
+    """Raised when there is not enough disk space to persist a screenshot."""
