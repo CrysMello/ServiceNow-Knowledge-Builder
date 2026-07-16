@@ -1,13 +1,14 @@
-"""Camada de apresentação: UI Manager em CustomTkinter.
+"""Camada de apresentação: CLI (``snkb <comando>``).
 
-Não contém regras de negócio (Module Specifications, Capítulo 2, seção
-2.1). Depende apenas dos ports de ``application``, nunca diretamente de
+Não contém regras de negócio. Depende apenas dos ports de
+``application`` (``ApplicationControllerPort``), nunca diretamente de
 ``infrastructure`` (ARQ-002).
 
-A classe concreta ``CustomTkinterUserInterface`` fica em
-``snkb.presentation.main_window`` e não é reexportada aqui de propósito:
-isso evita que qualquer import deste pacote (por exemplo, apenas para
-usar ``contracts.UserInterfacePort`` como tipo) exija o CustomTkinter
-instalado. Importe-a explicitamente quando precisar da implementação
-concreta.
+A implementação concreta fica inteiramente em
+``snkb.presentation.cli``. Não existe mais um Protocol único
+representando "a aplicação" (como havia em uma versão anterior deste
+projeto baseada em GUI, ver ADR 0002): uma CLI de múltiplos comandos
+independentes não tem um único ponto de entrada com ``run()``/
+``mainloop()`` para abstrair — cada comando é sua própria invocação de
+processo. Ver ADR 0003 para o histórico completo dessa decisão.
 """

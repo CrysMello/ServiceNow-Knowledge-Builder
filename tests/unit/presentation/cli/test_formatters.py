@@ -1,0 +1,75 @@
+"""Testes das funções puras de formatação de terminal."""
+
+from __future__ import annotations
+
+import re
+from uuid import UUID
+
+from snkb.domain.events.session_events import SessionFailed
+from snkb.presentation.cli.formatters.event_formatter import format_event_line
+from snkb.presentation.cli.formatters.session_formatter import format_session_info
+from snkb.presentation.cli.formatters.status_formatter import (
+    SECURITY_FOOTER_TEXT,
+    format_status_message,
+)
+from snkb.presentation.cli.state import RecordingState
+from snkb.presentation.cli.view_models import RecordingCounters, SessionInfo
+
+
+def test_format_status_message_covers_waiting_login() -> None:
+    message = format_status_message(RecordingState.WAITING_LOGIN, error_count=0)
+
+    assert "Aguardando autenticação Microsoft" in message
+
+
+def test_format_status_message_finished_without_errors() -> None:
+    message = format_status_message(RecordingState.FINISHED, error_count=0)
+
+    assert message == "Sessão concluída."
+
+
+def test_format_status_message_finished_with_errors_mentions_warnings() -> None:
+    message = format_status_message(RecordingState.FINISHED, error_count=2)
+
+    assert "avisos" in message
+
+
+def test_security_footer_text_is_the_mandatory_srs_message() -> None:
+    assert SECURITY_FOOTER_TEXT == "Nenhuma credencial foi armazenada."
+
+
+def test_format_session_info_uses_placeholder_for_missing_fields() -> None:
+    text = format_session_info(SessionInfo(), RecordingCounters())
+
+    assert "—" in text
+    assert "Session ID" in text
+    assert "Páginas: 0" in text
+
+
+def test_format_session_info_shows_known_fields(fixed_session_uuid: UUID) -> None:
+    info = SessionInfo(session_id=fixed_session_uuid, instance="empresa")
+    counters = RecordingCounters(page_count=3)
+
+    text = format_session_info(info, counters)
+
+    assert str(fixed_session_uuid) in text
+    assert "empresa" in text
+    assert "Páginas: 3" in text
+
+
+def test_format_event_line_never_leaks_event_fields(fixed_session_uuid: UUID) -> None:
+    secret_reason = "vazamento-hipotetico-nao-deveria-aparecer"
+    event = SessionFailed(session_id=fixed_session_uuid, reason=secret_reason)
+
+    line = format_event_line(event)
+
+    assert secret_reason not in line
+    assert "SessionFailed" in line
+
+
+def test_format_event_line_includes_a_hh_mm_ss_timestamp(fixed_session_uuid: UUID) -> None:
+    event = SessionFailed(session_id=fixed_session_uuid, reason="x")
+
+    line = format_event_line(event)
+
+    assert re.match(r"^\d{2}:\d{2}:\d{2} — SessionFailed$", line)

@@ -1,5 +1,6 @@
-"""Modelos de exibição (read models) dos painéis do UI Manager (Module
-Specifications, Capítulo 2, seção 2.9).
+"""Modelos de dados exibidos pela CLI durante ``snkb record`` (Module
+Specifications, Capítulo 2, seção 2.9 — adaptado de painéis de GUI para
+blocos de texto de terminal).
 
 São apenas dados: nenhuma classe aqui interpreta regras de negócio,
 acessa o navegador ou grava arquivos (2.4, "Responsabilidades
@@ -13,12 +14,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from snkb.presentation.state import UiState
+from snkb.presentation.cli.state import RecordingState
 
 
 @dataclass(slots=True)
-class SessionPanelViewModel:
-    """Dados exibidos no "Painel da Sessão" (2.9)."""
+class SessionInfo:
+    """Dados de identificação da sessão em andamento."""
 
     session_id: UUID | None = None
     started_at: datetime | None = None
@@ -30,17 +31,17 @@ class SessionPanelViewModel:
 
 
 @dataclass(slots=True)
-class StatusPanelViewModel:
-    """Contadores exibidos no "Painel de Status" (2.9).
+class RecordingCounters:
+    """Contadores exibidos durante a gravação.
 
     ``element_count``, ``screenshot_count`` e ``log_count`` permanecem
     em zero até que o Element Recorder, o Screenshot Engine e o Log
-    Engine publiquem eventos que o UI Manager possa consumir — exibir um
-    valor não derivado de um evento real violaria a responsabilidade do
+    Engine publiquem eventos que a CLI possa consumir — exibir um valor
+    não derivado de um evento real violaria a responsabilidade deste
     módulo de apenas repassar o que foi observado.
     """
 
-    status: UiState = UiState.IDLE
+    status: RecordingState = RecordingState.IDLE
     elapsed_seconds: float = 0.0
     page_count: int = 0
     element_count: int = 0
@@ -50,8 +51,8 @@ class StatusPanelViewModel:
 
 
 @dataclass(frozen=True, slots=True)
-class LogEntryViewModel:
-    """Uma linha do "Painel de Logs" (2.9)."""
+class LogEntry:
+    """Uma linha de log exibida pelo comando ``snkb logs``."""
 
     timestamp: datetime
     level: str

@@ -5,13 +5,24 @@ Architecture Document (SAD) and AI Coding Standards, section 6.
 
 ```
 src/snkb/
-├── presentation/          UI Manager contract (Chapter 2). No business rules.
+├── presentation/          CLI (`snkb <command>`). No business rules (ADR 0003).
+│   └── cli/
+│       ├── main.py          Typer app; registers the 7 minimum commands.
+│       ├── state.py          RecordingState (recording lifecycle).
+│       ├── view_models.py     SessionInfo, RecordingCounters, LogEntry.
+│       ├── event_queue.py      DomainEventQueue (thread-safe bridge).
+│       ├── state_machine.py    RecordingStateMachine.
+│       ├── status_aggregator.py RecordingCounterAggregator.
+│       ├── commands/           One thin Typer function per subcommand.
+│       ├── handlers/            RecordCommandHandler (the MVP flow),
+│       │                       EnterKeyListener, pending-module guard.
+│       └── formatters/          Pure functions: state/session/event -> text.
 │
 ├── application/           Use-case orchestration. Depends only on domain.
 │   ├── commands/          Intent payloads (imperative names, NAM-007).
 │   ├── queries/            Read-only request payloads.
 │   ├── services/           Application Controller port (single entry
-│   │                       point the UI is allowed to call, ARQ-002).
+│   │                       point the CLI is allowed to call, ARQ-002).
 │   └── ports/              Protocols each infrastructure adapter must
 │                           fulfill: BrowserManagerPort, SessionManagerPort,
 │                           NavigationRecorderPort, ElementRecorderPort,
@@ -21,7 +32,7 @@ src/snkb/
 │
 ├── domain/                 Entities, value objects, enums, events,
 │                           exceptions. No dependency on Playwright,
-│                           CustomTkinter, the file system or logging
+│                           Typer, the file system or logging
 │                           libraries (ARQ-001).
 │   ├── entities/            Session, Page, Frame, Element,
 │   │                        ElementSelectors, Screenshot, NavigationEdge.
@@ -42,7 +53,7 @@ src/snkb/
 │                           logging, configuration loading). Currently
 │                           empty packages reserved for future modules;
 │                           only this layer may import third-party
-│                           automation/UI/logging libraries.
+│                           browser-automation/logging libraries.
 │
 ├── modules/                 One subpackage per component from SAD
 │                           section 5 / Module Specifications Chapters

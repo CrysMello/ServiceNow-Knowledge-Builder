@@ -2,7 +2,13 @@
 
 ## Status
 
-Aceito — 2026-07-16.
+**Superseded by [ADR 0003](0003-cli-presentation-layer.md)** —
+2026-07-16. O produto passou a ser usado via terminal; o CustomTkinter
+descrito abaixo foi removido. Este documento é preservado como registro
+histórico da decisão original — não reescreva nem apague o conteúdo
+abaixo.
+
+~~Aceito — 2026-07-16.~~
 
 ## Contexto
 

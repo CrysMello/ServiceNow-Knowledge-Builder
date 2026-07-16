@@ -8,6 +8,6 @@ import pytest
 from snkb import bootstrap
 
 
-def test_create_application_raises_not_implemented_error() -> None:
+def test_create_controller_raises_not_implemented_error() -> None:
     with pytest.raises(NotImplementedError):
-        bootstrap.create_application()
+        bootstrap.create_controller()

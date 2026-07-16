@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "servicenow-knowledge-builder"
 version = "0.1.0"
-description = "Observes an authenticated ServiceNow session and produces a structured, reusable Knowledge Base for the future QA ServiceNow Assistant."
+description = "CLI que observa uma sessão autenticada do ServiceNow e produz uma Knowledge Base estruturada e reutilizável para o futuro QA ServiceNow Assistant."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "Proprietary" }
@@ -13,7 +13,7 @@ authors = [{ name = "Crystiane Madeira de Mello" }]
 
 dependencies = [
     "playwright>=1.45",
-    "customtkinter>=5.2",
+    "typer>=0.12",
     "pydantic>=2.7",
     "orjson>=3.10",
     "loguru>=0.7",
@@ -30,7 +30,7 @@ dev = [
 ]
 
 [project.scripts]
-snkb = "snkb.bootstrap:main"
+snkb = "snkb.presentation.cli.main:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -53,11 +53,6 @@ strict = true
 packages = ["snkb"]
 mypy_path = "src"
 explicit_package_bases = true
-
-[[tool.mypy.overrides]]
-# customtkinter não publica stubs nem um marcador py.typed.
-module = "customtkinter.*"
-ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 minversion = "8.0"

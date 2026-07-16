@@ -1,16 +1,17 @@
 
-# This file is generated for convenience in environments that expect a
-# requirements.txt (e.g. simple CI steps, `pip install -r`). The
-# authoritative dependency declaration is pyproject.toml — update that
-# file first and mirror changes here (AI Coding Standards, DEP-002).
+# Este arquivo é gerado por conveniência para ambientes que esperam um
+# requirements.txt (ex.: passos simples de CI, `pip install -r`). A
+# declaração de dependências oficial é o pyproject.toml — atualize
+# aquele arquivo primeiro e espelhe as mudanças aqui (AI Coding
+# Standards, DEP-002).
 
 playwright>=1.45
-customtkinter>=5.2
+typer>=0.12
 pydantic>=2.7
 orjson>=3.10
 loguru>=0.7
 
-# --- development / test tooling ---
+# --- ferramentas de desenvolvimento / teste ---
 pytest>=8.2
 pytest-cov>=5.0
 pytest-asyncio>=0.23
