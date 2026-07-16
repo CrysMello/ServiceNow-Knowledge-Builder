@@ -80,5 +80,22 @@ class OpenConfiguration:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
+class OpenExportFolder:
+    """Requests that the OS file explorer open the session's export
+    directory (Module Specifications, Chapter 2, section 2.12:
+    ``OPEN_EXPORT_FOLDER``)."""
+
+    session_id: UUID
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ShowReport:
+    """Requests that the session's HTML report be opened (Module
+    Specifications, Chapter 2, section 2.12: ``SHOW_REPORT``)."""
+
+    session_id: UUID
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
 class ExitApplication:
     """Requests a controlled application shutdown."""

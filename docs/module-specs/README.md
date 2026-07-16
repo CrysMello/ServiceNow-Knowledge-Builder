@@ -1,21 +1,21 @@
-# Module specifications
+# Especificações de módulo
 
-Place the authoritative Module Specifications document (and any
-per-module addenda) in this folder as they are approved. Each module
-implementation step (AI Development Guide, etapas 4-11) must cite the
-chapter and section number of the requirement it satisfies, matching
-the traceability matrix in SRS Chapter 14.
+Coloque aqui o documento oficial de Module Specifications (e qualquer
+adendo por módulo) à medida que for aprovado. Cada etapa de
+implementação de módulo (AI Development Guide, etapas 4-11) deve citar
+o capítulo e a seção do requisito que satisfaz, de acordo com a matriz
+de rastreabilidade do Capítulo 14 do SRS.
 
-Chapters covered by the current Module Specifications document:
+Capítulos cobertos pelo documento de Module Specifications atual:
 
-| Chapter | Module              | Port in `application/ports`     |
-| ------- | -------------------- | -------------------------------- |
-| 2       | UI Manager            | `presentation.contracts`         |
-| 3       | Browser Manager        | `browser_manager_port`           |
-| 4       | Session Manager        | `session_manager_port`           |
-| 5       | Navigation Recorder    | `navigation_recorder_port`       |
-| 6       | Element Recorder       | `element_recorder_port`          |
-| 7       | Selector Analyzer      | `selector_analyzer_port`         |
-| 8       | Screenshot Engine      | `screenshot_engine_port`         |
-| 9       | Export Engine          | `export_engine_port`             |
-| 10      | Log Engine             | `log_engine_port`                |
+| Capítulo | Módulo               | Port em `application/ports`   | Status        |
+| -------- | -------------------- | ------------------------------ | ------------- |
+| 2        | UI Manager            | `presentation.contracts`       | Implementado (ver ADR 0002) |
+| 3        | Browser Manager        | `browser_manager_port`         | Pendente      |
+| 4        | Session Manager        | `session_manager_port`         | Pendente      |
+| 5        | Navigation Recorder    | `navigation_recorder_port`     | Pendente      |
+| 6        | Element Recorder       | `element_recorder_port`        | Pendente      |
+| 7        | Selector Analyzer      | `selector_analyzer_port`       | Pendente      |
+| 8        | Screenshot Engine      | `screenshot_engine_port`       | Pendente      |
+| 9        | Export Engine          | `export_engine_port`           | Pendente      |
+| 10       | Log Engine             | `log_engine_port`              | Pendente      |

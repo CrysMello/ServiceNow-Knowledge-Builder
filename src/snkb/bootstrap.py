@@ -1,16 +1,16 @@
-"""Composition root: the only place authorized to choose concrete
-implementations for the application's ports (AI Coding Standards,
-section 10).
+"""Composition root: único local autorizado a escolher implementações
+concretas para os ports da aplicação (AI Coding Standards, seção 10).
 
-``create_application`` will eventually load configuration, construct the
-Log Engine, Browser Manager, Session Manager, Navigation Recorder,
-Element Recorder, Selector Analyzer, Screenshot Engine and Export
-Engine adapters, wire them into an ``ApplicationControllerPort``
-implementation, and hand that controller to the UI Manager.
+``create_application`` vai eventualmente carregar a configuração,
+construir os adaptadores do Log Engine, Browser Manager, Session
+Manager, Navigation Recorder, Element Recorder, Selector Analyzer,
+Screenshot Engine e Export Engine, ligá-los a uma implementação de
+``ApplicationControllerPort`` e entregar esse controller ao UI Manager
+(``CustomTkinterUserInterface``, já implementado).
 
-None of those adapters exist yet, so this function intentionally raises
-``NotImplementedError`` rather than returning a partially wired,
-non-functional application.
+Como nenhum desses adaptadores existe ainda, esta função levanta
+``NotImplementedError`` intencionalmente, em vez de devolver uma
+aplicação parcialmente ligada e não funcional (PR-007).
 """
 
 from __future__ import annotations
@@ -19,23 +19,29 @@ from snkb.presentation.contracts import UserInterfacePort
 
 
 def create_application() -> UserInterfacePort:
-    """Wire every adapter and return the ready-to-run UI entry point.
+    """Monta todos os adaptadores e retorna o ponto de entrada da UI,
+    pronto para rodar.
 
     Raises:
-        NotImplementedError: always, until the modules listed in the
-            AI Development Guide (etapas 4-11) are implemented.
+        NotImplementedError: sempre, até que os módulos listados no AI
+            Development Guide (etapas 4-10) sejam implementados. O UI
+            Manager (etapa 3) já está pronto em
+            ``snkb.presentation.main_window.CustomTkinterUserInterface``,
+            mas ainda não há um ``ApplicationControllerPort`` concreto
+            para injetar nele.
     """
     raise NotImplementedError(
-        "bootstrap.create_application: no module is implemented yet. "
-        "This scaffolding step only prepares the architecture; wiring "
-        "will be added once Browser Manager, Session Manager, "
-        "Navigation Recorder, Element Recorder, Selector Analyzer, "
-        "Screenshot Engine, Export Engine and Log Engine are built."
+        "bootstrap.create_application: o UI Manager já está implementado "
+        "(snkb.presentation.main_window.CustomTkinterUserInterface), mas "
+        "ainda faltam Browser Manager, Session Manager, Navigation "
+        "Recorder, Element Recorder, Selector Analyzer, Screenshot "
+        "Engine, Export Engine e Log Engine antes de existir um "
+        "ApplicationControllerPort concreto para conectar a ela."
     )
 
 
 def main() -> None:
-    """Application entry point (invoked by ``python -m snkb``)."""
+    """Ponto de entrada da aplicação (invocado por ``python -m snkb``)."""
     application = create_application()
     application.run()
 

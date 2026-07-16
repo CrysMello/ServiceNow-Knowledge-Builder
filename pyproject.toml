@@ -54,6 +54,11 @@ packages = ["snkb"]
 mypy_path = "src"
 explicit_package_bases = true
 
+[[tool.mypy.overrides]]
+# customtkinter não publica stubs nem um marcador py.typed.
+module = "customtkinter.*"
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 minversion = "8.0"
 addopts = "-q"

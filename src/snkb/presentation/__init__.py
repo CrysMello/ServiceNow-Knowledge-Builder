@@ -1,6 +1,13 @@
-"""Presentation layer: CustomTkinter UI Manager.
+"""Camada de apresentação: UI Manager em CustomTkinter.
 
-Contains no business rules (Module Specifications 2.1). Depends only on
-``application`` ports, never on ``infrastructure`` or ``domain``
-directly (ARQ-002).
+Não contém regras de negócio (Module Specifications, Capítulo 2, seção
+2.1). Depende apenas dos ports de ``application``, nunca diretamente de
+``infrastructure`` (ARQ-002).
+
+A classe concreta ``CustomTkinterUserInterface`` fica em
+``snkb.presentation.main_window`` e não é reexportada aqui de propósito:
+isso evita que qualquer import deste pacote (por exemplo, apenas para
+usar ``contracts.UserInterfacePort`` como tipo) exija o CustomTkinter
+instalado. Importe-a explicitamente quando precisar da implementação
+concreta.
 """
