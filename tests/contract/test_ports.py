@@ -5,6 +5,7 @@ guard against silent drift once concrete adapters are implemented.
 
 from __future__ import annotations
 
+from snkb.application.ports.browser_data_collector_port import BrowserDataCollectorPort
 from snkb.application.ports.browser_manager_port import BrowserManagerPort
 from snkb.application.ports.element_recorder_port import ElementRecorderPort
 from snkb.application.ports.event_publisher_port import EventPublisherPort
@@ -14,6 +15,7 @@ from snkb.application.ports.navigation_recorder_port import NavigationRecorderPo
 from snkb.application.ports.screenshot_engine_port import ScreenshotEnginePort
 from snkb.application.ports.selector_analyzer_port import SelectorAnalyzerPort
 from snkb.application.ports.session_manager_port import SessionManagerPort
+from snkb.application.services.application_controller_port import ApplicationControllerPort
 
 
 def _public_methods(protocol: type) -> set[str]:
@@ -138,3 +140,15 @@ def test_log_engine_port_matches_module_specification_10_15() -> None:
 
 def test_event_publisher_port_exposes_publish_only() -> None:
     assert _public_methods(EventPublisherPort) == {"publish"}
+
+
+def test_application_controller_port_matches_module_specification_2_5() -> None:
+    assert _public_methods(ApplicationControllerPort) == {"dispatch", "query", "subscribe"}
+
+
+def test_browser_data_collector_port_matches_adr_0013() -> None:
+    assert _public_methods(BrowserDataCollectorPort) == {
+        "start",
+        "capture_current_page",
+        "stop",
+    }

@@ -9,6 +9,9 @@ stderr.
 
 from __future__ import annotations
 
+from pathlib import Path
+
+import pytest
 from typer.testing import CliRunner
 
 from snkb import __version__
@@ -46,10 +49,17 @@ def test_record_without_instance_url_fails_with_usage_error() -> None:
     assert result.exit_code != 0
 
 
-def test_record_fails_cleanly_because_no_core_module_is_implemented_yet() -> None:
+def test_record_fails_cleanly_without_a_configuration_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Sem ``config/default.json``/``config/local.json`` (Configuration
+    Manager ainda não implementado — ver ADR 0012), ``bootstrap.
+    create_controller`` levanta ``FileNotFoundError``; o comando deve
+    reportar isso de forma limpa, nunca com um traceback bruto."""
+    monkeypatch.chdir(tmp_path)
+
     result = runner.invoke(app, ["record", "--instance-url", "https://empresa.service-now.com"])
 
     assert result.exit_code == 1
-    assert "Browser Manager" in result.output
-    # Nunca um traceback bruto do Python deve chegar ao usuário.
+    assert "config" in result.output.lower()
     assert "Traceback (most recent call last)" not in result.output

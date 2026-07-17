@@ -25,10 +25,11 @@ def record(
     o usuário pressione Enter ou interrompa com Ctrl+C."""
     try:
         controller = create_controller()
-    except NotImplementedError as error:
+    except Exception as error:
         typer.echo(f"Erro: {error}", err=True)
         raise typer.Exit(code=1) from error
 
     handler = RecordCommandHandler(controller)
+    controller.subscribe(handler.handle_domain_event)
     exit_code = handler.run(instance_url)
     raise typer.Exit(code=exit_code)

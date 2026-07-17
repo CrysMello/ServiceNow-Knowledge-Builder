@@ -15,6 +15,9 @@ def test_app_config_defaults_are_the_safest_option(tmp_path: Path) -> None:
     assert config.capture_policy.capture_field_values is False
     assert config.capture_policy.mask_sensitive_fields is True
     assert config.capture_policy.capture_authenticated_user is False
+    assert config.capture_policy.page_stability_seconds == 1.0
+    assert config.capture_policy.page_stability_max_wait_seconds == 5.0
+    assert config.capture_policy.max_elements_per_page == 500
 
 
 def test_app_config_rejects_blank_instance_url(tmp_path: Path) -> None:

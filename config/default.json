@@ -17,7 +17,10 @@
     "mask_sensitive_fields": true,
     "capture_screenshots": true,
     "full_page_screenshots": false,
-    "capture_authenticated_user": false
+    "capture_authenticated_user": false,
+    "page_stability_seconds": 1.0,
+    "page_stability_max_wait_seconds": 5.0,
+    "max_elements_per_page": 500
   },
   "login_detection": {
     "stability_seconds": 2.0,

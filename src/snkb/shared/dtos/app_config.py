@@ -16,7 +16,13 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 class CapturePolicyModel(BaseModel):
     """Policy controlling what the Recorder is allowed to capture (RS-011,
-    RF-038)."""
+    RF-038).
+
+    ``page_stability_seconds``/``page_stability_max_wait_seconds``/
+    ``max_elements_per_page`` control the Browser Data Collector's page
+    stability debounce (ADR 0013) — never ``networkidle``, always a
+    deterministic, configurable timeout.
+    """
 
     model_config = ConfigDict(frozen=True)
 
@@ -25,6 +31,9 @@ class CapturePolicyModel(BaseModel):
     capture_screenshots: bool = True
     full_page_screenshots: bool = False
     capture_authenticated_user: bool = False
+    page_stability_seconds: float = Field(default=1.0, ge=0)
+    page_stability_max_wait_seconds: float = Field(default=5.0, gt=0)
+    max_elements_per_page: int = Field(default=500, gt=0)
 
 
 class LoginDetectionPolicyModel(BaseModel):

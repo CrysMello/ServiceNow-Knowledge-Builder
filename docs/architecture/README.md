@@ -21,14 +21,18 @@ src/snkb/
 ├── application/           Use-case orchestration. Depends only on domain.
 │   ├── commands/          Intent payloads (imperative names, NAM-007).
 │   ├── queries/            Read-only request payloads.
-│   ├── services/           Application Controller port (single entry
-│   │                       point the CLI is allowed to call, ARQ-002).
+│   ├── services/           application_controller_port.py (dispatch/
+│   │                       query/subscribe, the single entry point the
+│   │                       CLI is allowed to call, ARQ-002) and
+│   │                       application_controller.py — ApplicationController
+│   │                       + InMemoryEventBus (ADR 0012), implemented.
 │   └── ports/              Protocols each infrastructure adapter must
 │                           fulfill: BrowserManagerPort, SessionManagerPort,
 │                           NavigationRecorderPort, ElementRecorderPort,
 │                           SelectorAnalyzerPort, ScreenshotEnginePort,
 │                           ExportEnginePort, LogEnginePort,
-│                           ConfigurationProviderPort, EventPublisherPort.
+│                           ConfigurationProviderPort, EventPublisherPort,
+│                           BrowserDataCollectorPort (ADR 0013).
 │
 ├── domain/                 Entities, value objects, enums, events,
 │                           exceptions. No dependency on Playwright,
@@ -53,8 +57,10 @@ src/snkb/
 │                           logging, configuration loading). Only this
 │                           layer may import third-party browser-
 │                           automation/logging libraries.
-│   ├── browser/               PlaywrightBrowserManager (ADR 0004) —
-│   │                          implemented.
+│   ├── browser/               PlaywrightBrowserManager (ADR 0004) and
+│   │                          BrowserDataCollector (ADR 0013) —
+│   │                          implemented; the only two modules
+│   │                          authorized to import Playwright (PW-001).
 │   └── logging/               LoguruLogEngine (ADR 0011) — implemented.
 │                            storage/, configuration/ remain reserved.
 │
@@ -73,9 +79,13 @@ src/snkb/
 │                            All modules/* subpackages (Chapters 4-9)
 │                            now implemented, alongside Browser Manager
 │                            (Chapter 3) and Log Engine (Chapter 10)
-│                            under infrastructure/. Only the
-│                            Application Controller (composition root
-│                            wiring) remains pending.
+│                            under infrastructure/, and connected by
+│                            ApplicationController (ADR 0012). Element
+│                            Recorder/Selector Analyzer/Screenshot
+│                            Engine are now fed real DOM/screenshot data
+│                            by BrowserDataCollector (ADR 0013), closing
+│                            the end-to-end pipeline — real exports now
+│                            succeed.
 │
 ├── shared/                  Dependency-free building blocks usable from
 │                           any layer.

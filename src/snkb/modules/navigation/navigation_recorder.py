@@ -271,6 +271,13 @@ class NavigationRecorder:
         self._last_observed_tab_id = tab_id
         self._publish(NavigationUrlChanged(session_id=session_id, url=url))
 
+    def get_tab_id_for_page(self, page_id: UUID) -> str | None:
+        """Além da superfície mínima do Port — usado pelo Browser Data
+        Collector (ADR 0013) para reenviar um título obtido depois da
+        captura inicial via ``observe_navigation()`` + ``update_page()``,
+        fechando a lacuna já documentada na ADR 0006."""
+        return self._tab_id_by_page.get(page_id)
+
     # ------------------------------------------------------------------
     # Internals
     # ------------------------------------------------------------------
