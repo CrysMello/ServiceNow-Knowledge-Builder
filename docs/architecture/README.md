@@ -60,9 +60,12 @@ src/snkb/
 ├── modules/                 One subpackage per component from SAD
 │                           section 5 / Module Specifications Chapters
 │                           3-10 (session, navigation, elements,
-│                           selectors, screenshots, export). Each will
-│                           hold the concrete class that fulfills the
+│                           selectors, screenshots, export). Each holds
+│                           the concrete class that fulfills the
 │                           matching port in application/ports.
+│   └── session/              SessionManager (ADR 0005) — implemented.
+│                            navigation/, elements/, selectors/,
+│                            screenshots/, export/ remain reserved.
 │
 ├── shared/                  Dependency-free building blocks usable from
 │                           any layer.

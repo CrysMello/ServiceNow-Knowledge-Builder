@@ -1,6 +1,8 @@
-"""Session module (reserved).
+"""Session module.
 
-Will provide the concrete ``SessionManagerPort`` implementation
-described in Module Specifications, Chapter 4. Depends only on the
-Browser Manager, Configuration Manager and Log Engine ports (4.5).
+Implementa ``SessionManagerPort`` (Module Specifications, Capítulo 4)
+em ``session_manager.SessionManager`` — ver ADR 0005. Não depende de
+Playwright, sistema de arquivos ou bibliotecas de log concretas; recebe
+``EventPublisherPort`` e ``LogEnginePort`` por injeção de dependência,
+como os demais módulos centrais.
 """

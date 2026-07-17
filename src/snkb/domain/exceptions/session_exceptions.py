@@ -23,3 +23,8 @@ class SessionExpiredError(KnowledgeBuilderError):
 
 class DuplicatePageError(KnowledgeBuilderError):
     """Raised when a page identifier is already associated with another page."""
+
+
+class InvalidMetadataError(KnowledgeBuilderError):
+    """Raised when ``update_metadata`` receives a field the ``Session``
+    entity does not expose for post-creation updates."""
