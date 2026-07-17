@@ -178,6 +178,12 @@ class ScreenshotEngine:
     def get_screenshot(self, screenshot_id: UUID) -> Screenshot | None:
         return self._screenshots_by_id.get(screenshot_id)
 
+    def get_screenshots(self, page_id: UUID) -> list[Screenshot]:
+        """Além da superfície mínima do Port — usado pelo Export Engine
+        (ADR 0010) para montar o manifesto de screenshots por página,
+        já que o Port só expõe consulta por ``screenshot_id`` isolado."""
+        return list(self._screenshots_by_page.get(page_id, []))
+
     def delete(self, screenshot_id: UUID) -> None:
         screenshot = self._screenshots_by_id.pop(screenshot_id, None)
         if screenshot is None:

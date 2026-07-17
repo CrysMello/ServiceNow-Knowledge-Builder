@@ -1,8 +1,9 @@
-"""Export module (reserved).
+"""Export module.
 
-Will provide the concrete ``ExportEnginePort`` implementation described
-in Module Specifications, Chapter 9, using an Export Provider strategy
-per format (JSON, PNG, HTML, LOG — section 9.22). Depends on the
-Session Manager, Navigation Recorder, Element Recorder, Selector
-Analyzer, Screenshot Engine and Log Engine ports (9.5).
+Implementa ``ExportEnginePort`` (Module Specifications, Capítulo 9) em
+``export_engine.ExportEngine`` — ver ADR 0010. Único módulo central que
+grava arquivos em disco (JSON via Pydantic, HTML do relatório), usando
+apenas a biblioteca padrão — nunca captura nada sozinho, apenas
+consolida o que Session Manager, Navigation Recorder, Element
+Recorder, Selector Analyzer e Screenshot Engine já produziram (9.5).
 """

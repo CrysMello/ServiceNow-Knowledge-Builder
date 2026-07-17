@@ -67,8 +67,14 @@ src/snkb/
 │   ├── navigation/            NavigationRecorder (ADR 0006) — implemented.
 │   ├── elements/              ElementRecorder (ADR 0007) — implemented.
 │   ├── selectors/             SelectorAnalyzer (ADR 0008) — implemented.
-│   └── screenshots/           ScreenshotEngine (ADR 0009) — implemented.
-│                            export/ remains reserved.
+│   ├── screenshots/           ScreenshotEngine (ADR 0009) — implemented.
+│   └── export/                ExportEngine (ADR 0010) — implemented.
+│                            All modules/* subpackages (Chapters 4-9)
+│                            now implemented. Log Engine (Chapter 10)
+│                            remains reserved under infrastructure/
+│                            logging/; the Application Controller
+│                            (composition root wiring) is also still
+│                            pending.
 │
 ├── shared/                  Dependency-free building blocks usable from
 │                           any layer.
