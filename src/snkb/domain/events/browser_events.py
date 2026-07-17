@@ -27,12 +27,14 @@ class LoginDetected(DomainEvent):
 class PageChanged(DomainEvent):
     session_id: UUID
     url: str
+    tab_id: str
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UrlChanged(DomainEvent):
     session_id: UUID
     url: str
+    tab_id: str
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

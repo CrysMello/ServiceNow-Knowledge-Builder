@@ -11,7 +11,7 @@ Capítulos cobertos pelo documento de Module Specifications atual:
 | Capítulo | Módulo               | Port em `application/ports`   | Status        |
 | -------- | -------------------- | ------------------------------ | ------------- |
 | 2        | UI Manager (substituído por CLI) | `presentation.cli.main` | Camada de apresentação é CLI, não GUI — ver ADR 0003 (supersede o ADR 0002) |
-| 3        | Browser Manager        | `browser_manager_port`         | Pendente      |
+| 3        | Browser Manager        | `browser_manager_port`         | Implementado — `infrastructure.browser.browser_manager.PlaywrightBrowserManager` (ver ADR 0004); ainda não conectado a `bootstrap.create_controller` |
 | 4        | Session Manager        | `session_manager_port`         | Pendente      |
 | 5        | Navigation Recorder    | `navigation_recorder_port`     | Pendente      |
 | 6        | Element Recorder       | `element_recorder_port`        | Pendente      |
@@ -31,7 +31,7 @@ substituído pela chamada real assim que o módulo listado existir.
 
 | Módulo (Capítulo) | Desbloqueia na CLI | Arquivo a alterar quando o módulo existir | Feito? |
 | --- | --- | --- | --- |
-| Browser Manager (3) | `snkb record`: abrir navegador + aguardar login manual (hoje só dispara `StartCapture` e para no `NotImplementedError` de `create_controller`) | `bootstrap.create_controller` (wiring), sem mudança em `record_handler.py` | ☐ |
+| Browser Manager (3) | `snkb record`: abrir navegador + aguardar login manual (hoje ainda para no `NotImplementedError` de `create_controller`, pois falta o Application Controller para instanciar o `PlaywrightBrowserManager`) | `bootstrap.create_controller` (wiring), sem mudança em `record_handler.py` | ☑ adapter pronto (ADR 0004) / ☐ ligado ao bootstrap |
 | Session Manager (4) | `snkb record`: sessão de fato criada/rastreada (evento `SessionStarted`); **`snkb status`** passa a funcionar | `bootstrap.create_controller`; `presentation/cli/commands/status.py` (remover `announce_pending`, implementar consulta real via `GetSessionStatus`/`GetSessionStatistics`) | ☐ |
 | Navigation Recorder (5) | `snkb record`: contador "Páginas" deixa de ficar sempre associado só ao evento `PageCaptured` já simulável — passa a refletir navegação real | `bootstrap.create_controller` (wiring) | ☐ |
 | Element Recorder (6) | `snkb record`: contador "Elementos" (hoje fixo em 0 — ver `RecordingCounters`/`RecordingCounterAggregator`) | `presentation/cli/status_aggregator.py` (adicionar caso para o evento de elemento capturado) | ☐ |

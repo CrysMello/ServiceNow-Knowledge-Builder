@@ -1,6 +1,7 @@
-"""Reserved for the Playwright-based Browser Manager adapter
-(Module Specifications, Chapter 3; ``BrowserManagerPort``).
+"""Adaptador do Browser Manager sobre Playwright (Module Specifications,
+Capítulo 3; ``BrowserManagerPort``, ver ADR 0004).
 
-Only this package may import ``playwright`` (PW-001). Not implemented in
-this scaffolding step.
+Único pacote autorizado a importar ``playwright`` (PW-001). A classe
+concreta é ``PlaywrightBrowserManager``, em
+``snkb.infrastructure.browser.browser_manager``.
 """

@@ -18,5 +18,17 @@
     "capture_screenshots": true,
     "full_page_screenshots": false,
     "capture_authenticated_user": false
+  },
+  "login_detection": {
+    "stability_seconds": 2.0,
+    "poll_interval_seconds": 1.0,
+    "timeout_seconds": 600.0,
+    "microsoft_login_hostnames": [
+      "login.microsoftonline.com",
+      "login.microsoft.com",
+      "login.live.com"
+    ],
+    "service_now_marker_selector": null,
+    "expected_title_substring": null
   }
 }

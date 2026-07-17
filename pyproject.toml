@@ -59,6 +59,7 @@ minversion = "8.0"
 addopts = "-q"
 testpaths = ["tests"]
 pythonpath = ["src"]
+asyncio_mode = "auto"
 
 [tool.coverage.run]
 source = ["src/snkb"]

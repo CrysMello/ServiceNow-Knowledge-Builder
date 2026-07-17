@@ -27,6 +27,31 @@ class CapturePolicyModel(BaseModel):
     capture_authenticated_user: bool = False
 
 
+class LoginDetectionPolicyModel(BaseModel):
+    """Policy controlling how the Browser Manager decides that the manual
+    Microsoft login finished and the ServiceNow instance loaded (SRS,
+    section 3.3; RF-004).
+
+    RF-004 requires the detection to rely on at least two independent,
+    configurable signals rather than a single selector, precisely
+    because corporate instances may customize their login/landing
+    pages.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    stability_seconds: float = Field(default=2.0, ge=0)
+    poll_interval_seconds: float = Field(default=1.0, gt=0)
+    timeout_seconds: float = Field(default=600.0, gt=0)
+    microsoft_login_hostnames: tuple[str, ...] = (
+        "login.microsoftonline.com",
+        "login.microsoft.com",
+        "login.live.com",
+    )
+    service_now_marker_selector: str | None = None
+    expected_title_substring: str | None = None
+
+
 class AppConfig(BaseModel):
     """Root configuration model, validated at startup (CFG-001).
 
@@ -52,6 +77,7 @@ class AppConfig(BaseModel):
     max_journal_loss_seconds: float = Field(default=10.0, ge=0)
 
     capture_policy: CapturePolicyModel = Field(default_factory=CapturePolicyModel)
+    login_detection: LoginDetectionPolicyModel = Field(default_factory=LoginDetectionPolicyModel)
 
     @field_validator("instance_url")
     @classmethod

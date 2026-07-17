@@ -50,10 +50,12 @@ src/snkb/
 │                            failure mode documented per module.
 │
 ├── infrastructure/          Concrete adapters (Playwright, file system,
-│                           logging, configuration loading). Currently
-│                           empty packages reserved for future modules;
-│                           only this layer may import third-party
-│                           browser-automation/logging libraries.
+│                           logging, configuration loading). Only this
+│                           layer may import third-party browser-
+│                           automation/logging libraries.
+│   └── browser/              PlaywrightBrowserManager (ADR 0004) —
+│                            implemented. storage/, logging/,
+│                            configuration/ remain reserved.
 │
 ├── modules/                 One subpackage per component from SAD
 │                           section 5 / Module Specifications Chapters
