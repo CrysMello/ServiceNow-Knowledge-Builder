@@ -11,3 +11,14 @@ class ScreenshotCaptureError(KnowledgeBuilderError):
 
 class InsufficientDiskSpaceError(KnowledgeBuilderError):
     """Raised when there is not enough disk space to persist a screenshot."""
+
+
+class NoPendingCaptureError(KnowledgeBuilderError):
+    """Raised when ``capture()`` is called without a prior
+    ``stage_capture()``, or when the capture policy disables screenshots
+    entirely (``CapturePolicyModel.capture_screenshots``)."""
+
+
+class ScreenshotNotFoundError(KnowledgeBuilderError):
+    """Raised when ``delete()`` references a screenshot id that was never
+    captured."""

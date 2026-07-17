@@ -1,7 +1,9 @@
-"""Elements module (reserved).
+"""Elements module.
 
-Will provide the concrete ``ElementRecorderPort`` implementation
-described in Module Specifications, Chapter 6. Depends only on the
-Browser Manager, Navigation Recorder, Session Manager and Log Engine
-ports (6.5).
+Implementa ``ElementRecorderPort`` (Module Specifications, Capítulo 6)
+em ``element_recorder.ElementRecorder`` — ver ADR 0007. Não depende de
+Playwright nem de nenhum outro módulo central: identifica e classifica
+elementos via ``observe_elements()``, alimentado por quem já tem acesso
+ao DOM real (hoje o futuro Application Controller). Nunca lê nem
+armazena o valor de um campo.
 """

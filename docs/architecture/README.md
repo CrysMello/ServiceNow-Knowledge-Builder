@@ -63,9 +63,12 @@ src/snkb/
 │                           selectors, screenshots, export). Each holds
 │                           the concrete class that fulfills the
 │                           matching port in application/ports.
-│   └── session/              SessionManager (ADR 0005) — implemented.
-│                            navigation/, elements/, selectors/,
-│                            screenshots/, export/ remain reserved.
+│   ├── session/               SessionManager (ADR 0005) — implemented.
+│   ├── navigation/            NavigationRecorder (ADR 0006) — implemented.
+│   ├── elements/              ElementRecorder (ADR 0007) — implemented.
+│   ├── selectors/             SelectorAnalyzer (ADR 0008) — implemented.
+│   └── screenshots/           ScreenshotEngine (ADR 0009) — implemented.
+│                            export/ remains reserved.
 │
 ├── shared/                  Dependency-free building blocks usable from
 │                           any layer.

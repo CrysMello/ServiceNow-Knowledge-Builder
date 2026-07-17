@@ -12,3 +12,8 @@ class SelectorGenerationError(KnowledgeBuilderError):
 class NoViableSelectorError(KnowledgeBuilderError):
     """Raised when every candidate is invalid; the element is marked
     "Não Automatizável" instead of failing the whole session."""
+
+
+class PageSessionNotRegisteredError(KnowledgeBuilderError):
+    """Raised when ``analyze()``/``update_selector()`` need the session id
+    of a page that was never registered via ``register_session_for_page()``."""

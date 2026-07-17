@@ -1,6 +1,9 @@
-"""Selectors module (reserved).
+"""Selectors module.
 
-Will provide the concrete ``SelectorAnalyzerPort`` implementation
-described in Module Specifications, Chapter 7. Depends only on the
-Element Recorder and Log Engine ports (7.5).
+Implementa ``SelectorAnalyzerPort`` (Module Specifications, Capítulo
+7) em ``selector_analyzer.SelectorAnalyzer`` — ver ADR 0008. Única
+dependência de outro módulo central: ``ElementRecorderPort`` (7.5),
+já que todos os atributos necessários para gerar seletores já foram
+capturados e classificados pelo Element Recorder. Sem I/O, sem
+Playwright.
 """
