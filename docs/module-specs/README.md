@@ -18,7 +18,7 @@ Capítulos cobertos pelo documento de Module Specifications atual:
 | 7        | Selector Analyzer      | `selector_analyzer_port`       | Implementado — `modules.selectors.selector_analyzer.SelectorAnalyzer` (ver ADR 0008); ainda não conectado a `bootstrap.create_controller` |
 | 8        | Screenshot Engine      | `screenshot_engine_port`       | Implementado — `modules.screenshots.screenshot_engine.ScreenshotEngine` (ver ADR 0009); ainda não conectado a `bootstrap.create_controller` |
 | 9        | Export Engine          | `export_engine_port`           | Implementado — `modules.export.export_engine.ExportEngine` (ver ADR 0010); ainda não conectado a `bootstrap.create_controller` |
-| 10       | Log Engine             | `log_engine_port`              | Pendente      |
+| 10       | Log Engine             | `log_engine_port`              | Implementado — `infrastructure.logging.log_engine.LoguruLogEngine` (ver ADR 0011); ainda não conectado a `bootstrap.create_controller` |
 
 ## Checklist de desbloqueio na CLI (ADR 0003)
 
@@ -38,7 +38,7 @@ substituído pela chamada real assim que o módulo listado existir.
 | Selector Analyzer (7) | Nenhum comando CLI direto — alimenta `selectors.json`, consumido pelo Export Engine | `bootstrap.create_controller` (wiring: `register_session_for_page()` + chamar `analyze()` após cada `ElementsCaptured`) | ☑ adapter pronto (ADR 0008) / ☐ ligado ao bootstrap |
 | Screenshot Engine (8) | `snkb record`: contador "Screenshots" (hoje fixo em 0) | `presentation/cli/status_aggregator.py` (adicionar caso para `ScreenshotCreated`); `bootstrap.create_controller` (wiring: encaminhar capturas do Playwright para `stage_capture()` + `capture_page()`/`capture_modal()`/`capture_popup()`) | ☑ adapter pronto (ADR 0009) / ☐ ligado ao bootstrap |
 | Export Engine (9) | `snkb record`: exportação final e caminho da Base de Conhecimento (`ExportCompleted`/`ExportFailed` já tratados); **`snkb validate`** e **`snkb open`** passam a funcionar | `presentation/cli/commands/validate.py` e `open_folder.py` (remover `announce_pending`); `bootstrap.create_controller` (wiring: injetar os 5 módulos + `output_directory` de `AppConfig`) | ☑ adapter pronto (ADR 0010) / ☐ ligado ao bootstrap |
-| Log Engine (10) | **`snkb logs`** passa a funcionar; contador "Logs" em `snkb record` | `presentation/cli/commands/logs.py` (remover `announce_pending`) | ☐ |
+| Log Engine (10) | **`snkb logs`** passa a funcionar; contador "Logs" em `snkb record` | `presentation/cli/commands/logs.py` (remover `announce_pending`); `bootstrap.create_controller` (wiring: instanciar `LoguruLogEngine` e injetá-lo em todos os demais módulos) | ☑ adapter pronto (ADR 0011) / ☐ ligado ao bootstrap |
 | Configuration Manager (SAD, não numerado no Module Specifications) | **`snkb config`** passa a funcionar; `snkb record --instance-url` passa a ter valor padrão vindo de `config/default.json` | `presentation/cli/commands/config.py`; `presentation/cli/commands/record.py` | ☐ |
 | Application Controller (nenhum capítulo próprio — é o composition root) | Todos os comandos deixam de propagar `NotImplementedError` de `create_controller`; decide como eventos chegam a `RecordCommandHandler.handle_domain_event` (callback direto vs. Protocol de assinatura — decisão adiada no ADR 0003) | `bootstrap.py` (implementação real de `create_controller`) | ☐ |
 

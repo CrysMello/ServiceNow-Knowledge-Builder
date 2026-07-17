@@ -53,9 +53,10 @@ src/snkb/
 │                           logging, configuration loading). Only this
 │                           layer may import third-party browser-
 │                           automation/logging libraries.
-│   └── browser/              PlaywrightBrowserManager (ADR 0004) —
-│                            implemented. storage/, logging/,
-│                            configuration/ remain reserved.
+│   ├── browser/               PlaywrightBrowserManager (ADR 0004) —
+│   │                          implemented.
+│   └── logging/               LoguruLogEngine (ADR 0011) — implemented.
+│                            storage/, configuration/ remain reserved.
 │
 ├── modules/                 One subpackage per component from SAD
 │                           section 5 / Module Specifications Chapters
@@ -70,11 +71,11 @@ src/snkb/
 │   ├── screenshots/           ScreenshotEngine (ADR 0009) — implemented.
 │   └── export/                ExportEngine (ADR 0010) — implemented.
 │                            All modules/* subpackages (Chapters 4-9)
-│                            now implemented. Log Engine (Chapter 10)
-│                            remains reserved under infrastructure/
-│                            logging/; the Application Controller
-│                            (composition root wiring) is also still
-│                            pending.
+│                            now implemented, alongside Browser Manager
+│                            (Chapter 3) and Log Engine (Chapter 10)
+│                            under infrastructure/. Only the
+│                            Application Controller (composition root
+│                            wiring) remains pending.
 │
 ├── shared/                  Dependency-free building blocks usable from
 │                           any layer.
