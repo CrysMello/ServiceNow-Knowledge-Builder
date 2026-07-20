@@ -1,38 +1,48 @@
 # ServiceNow Knowledge Builder
 
-Command-line application (`snkb`) that observes an authenticated
-ServiceNow session and produces a structured, reusable **Knowledge
-Base** — pages, elements, selectors, navigation graph, screenshots and
-reports — for later consumption by the future **QA ServiceNow
-Assistant**.
+Aplicação de linha de comando (`snkb`) que observa uma sessão
+autenticada do ServiceNow e produz uma **Base de Conhecimento**
+estruturada e reutilizável — páginas, elementos, seletores, grafo de
+navegação, screenshots e relatórios — para consumo futuro pelo **QA
+ServiceNow Assistant**.
 
-The Knowledge Builder never automates ServiceNow business actions,
-never fills forms, never clicks on the user's behalf, and never
-automates or stores Microsoft Entra ID (SSO) credentials, MFA codes or
-tokens. Authentication is always manual. See `RS-001` through `RS-015`
-in the Business Rules document for the full list of security
-guarantees.
+O Knowledge Builder nunca automatiza ações de negócio do ServiceNow,
+nunca preenche formulários, nunca clica em nome do usuário, e nunca
+automatiza ou armazena credenciais, códigos MFA ou tokens do Microsoft
+Entra ID (SSO). A autenticação é sempre manual. Ver `RS-001` a
+`RS-015` no documento de Regras de Negócio para a lista completa de
+garantias de segurança.
 
 ## Status
 
-The architectural scaffold (package structure, domain models, ports,
-DTOs, exceptions, events, configuration — see
+O scaffold arquitetural (estrutura de pacotes, modelos de domínio,
+ports, DTOs, exceções, eventos, configuração — ver
 [docs/adr/0001-project-scaffolding.md](docs/adr/0001-project-scaffolding.md))
-and the CLI presentation layer (see
+e a camada de apresentação da CLI (ver
 [docs/adr/0003-cli-presentation-layer.md](docs/adr/0003-cli-presentation-layer.md))
-are implemented. `snkb --help`, `snkb version` and the 5 "pending"
-commands (`status`, `validate`, `open`, `logs`, `config`) work today.
-`snkb record` runs its full flow but fails with a clear message at the
-point where it needs a core module (Browser Manager, Session Manager,
-...) that is not implemented yet — none of the central modules
+estão implementados. Todos os oito módulos centrais dos Capítulos 3–10
+do Module Specifications também estão implementados e conectados
 (Browser Manager, Session Manager, Navigation Recorder, Element
 Recorder, Selector Analyzer, Screenshot Engine, Export Engine, Log
-Engine) has business logic yet.
+Engine — ADRs 0004–0011), junto com o `ApplicationController`
+(ADR 0012) e o Browser Data Collector (ADR 0013), que fecha o pipeline
+ponta a ponta com dados reais.
 
-## Source of truth
+`snkb record --instance-url ...` já funciona de ponta a ponta: abre um
+Chromium real, aguarda o login manual, rastreia a navegação, coleta
+elementos reais de DOM, gera seletores, captura screenshots e exporta
+uma Base de Conhecimento completa ao encerrar. `snkb --help`,
+`snkb version` e os demais comandos "pendentes" (`status`, `validate`,
+`open`, `logs`, `config`) continuam chamando `announce_pending` — eles
+dependem de um mecanismo de descoberta da sessão mais recente em disco
+(cada invocação da CLI é um processo novo) ou do Configuration
+Manager, nenhum dos dois implementado ainda (ver ADR 0012/0013,
+"Consequências").
 
-Implementation must always be traceable to these documents, consulted
-in this order of authority (AI Coding Standards, section 2):
+## Fonte da verdade
+
+A implementação deve sempre ser rastreável a estes documentos,
+consultados nesta ordem de autoridade (AI Coding Standards, seção 2):
 
 1. Product Vision
 2. Software Requirements Specification (SRS)
@@ -42,20 +52,20 @@ in this order of authority (AI Coding Standards, section 2):
 6. Interface Contracts
 7. AI Coding Standards
 
-## Architecture
+## Arquitetura
 
-Clean Architecture with four layers, each depending only on the one
-below it:
+Clean Architecture com quatro camadas, cada uma dependendo apenas da
+camada abaixo dela:
 
 ```
 presentation  → application → domain
 infrastructure → application/domain (ports)
 ```
 
-See [docs/architecture/README.md](docs/architecture/README.md) for the
-full directory map and the responsibility of every package.
+Ver [docs/architecture/README.md](docs/architecture/README.md) para o
+mapa completo de diretórios e a responsabilidade de cada pacote.
 
-## Getting started
+## Primeiros passos
 
 ```bash
 python -m venv .venv
@@ -64,7 +74,7 @@ pip install -e ".[dev]"
 playwright install chromium
 ```
 
-Run the test suite:
+Rodar a suíte de testes:
 
 ```bash
 pytest
@@ -73,43 +83,47 @@ black --check .
 mypy src
 ```
 
-## Usage
+## Uso
 
 ```bash
-snkb --help              # lists all 7 commands
-snkb version             # prints the installed version
-snkb record --instance-url https://your-instance.service-now.com
-snkb status              # session status (pending: needs Session Manager)
-snkb validate             # Knowledge Base integrity check (pending: needs Export Engine)
-snkb open                 # opens the export folder (pending: needs Export Engine)
-snkb logs                  # session logs (pending: needs Log Engine)
-snkb config                 # effective configuration (pending: needs Configuration Manager)
+snkb --help              # lista os 7 comandos
+snkb version             # imprime a versão instalada
+snkb record --instance-url https://sua-instancia.service-now.com
+snkb status              # status da sessão (pendente: precisa de descoberta em disco)
+snkb validate             # verificação de integridade da Base de Conhecimento (pendente)
+snkb open                 # abre a pasta de exportação (pendente)
+snkb logs                  # logs da sessão (pendente)
+snkb config                 # configuração efetiva (pendente: precisa do Configuration Manager)
 ```
 
-`snkb record` opens the browser, waits for manual Microsoft login,
-records the navigation, and stops safely on `Enter` or `Ctrl+C`,
-exporting the Knowledge Base. See
+`snkb record` abre o navegador, aguarda o login manual via Microsoft,
+grava a navegação e encerra com segurança ao pressionar `Enter` ou
+`Ctrl+C`, exportando a Base de Conhecimento para
+`exports/<session-id>/`. Ver
 [docs/adr/0003-cli-presentation-layer.md](docs/adr/0003-cli-presentation-layer.md)
-for the full command flow.
+para o fluxo completo de comandos e
+[docs/adr/0013-browser-data-collector.md](docs/adr/0013-browser-data-collector.md)
+para como os dados reais são coletados e exportados.
 
-## Repository layout
+## Estrutura do repositório
 
 ```
-src/snkb/           Application source (see docs/architecture)
-tests/               unit, integration, contract, acceptance
-docs/                architecture notes, ADRs, module specifications
-schemas/             JSON Schemas for exported artifacts
-config/              default application configuration
-exports/             session output (never versioned)
-logs/                session logs (never versioned)
-examples/            usage examples, added once modules exist
-scripts/             developer tooling
+src/snkb/           Código-fonte da aplicação (ver docs/architecture)
+tests/               unitários, integração, contrato, aceite
+docs/                notas de arquitetura, ADRs, module specifications
+schemas/             JSON Schemas dos artefatos exportados
+config/              configuração padrão da aplicação
+exports/             saída das sessões (nunca versionado)
+logs/                logs de sessão (nunca versionado)
+examples/            exemplos de uso
+scripts/             ferramentas de desenvolvimento
 ```
 
-## Roadmap
+## Roteiro
 
-The CLI presentation layer is done (ADR 0003). Development now
-proceeds module by module, per the AI Development Guide: Browser
-Manager → Session Manager → Navigation Recorder → Element Recorder →
-Selector Analyzer → Screenshot Engine → Export Engine → Log Engine →
-integration → tests → traceability validation.
+A camada de apresentação da CLI está concluída (ADR 0003), assim como
+os oito módulos centrais e o Application Controller (ADRs 0004–0012) e
+o Browser Data Collector (ADR 0013), que fecha o pipeline ponta a
+ponta com dados reais. Os próximos passos são os comandos que
+dependem de descoberta de sessão em disco (`status`/`validate`/`open`/
+`logs`) e o Configuration Manager (`config`).
