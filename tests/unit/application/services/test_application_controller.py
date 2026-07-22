@@ -17,6 +17,7 @@ from __future__ import annotations
 import asyncio
 import time
 from collections.abc import Callable
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID
 
@@ -24,16 +25,22 @@ import pytest
 
 from snkb.application.commands.commands import (
     ExitApplication,
+    OpenExportFolder,
     PauseCapture,
     ResumeCapture,
     StartCapture,
     StopCapture,
 )
+from snkb.application.ports.log_reader_port import LogRecordSummary
+from snkb.application.ports.session_discovery_port import SessionSummary
 from snkb.application.queries.queries import (
+    GetEffectiveConfiguration,
     GetNavigationTimeline,
     GetRecentSessions,
+    GetSessionLogs,
     GetSessionStatistics,
     GetSessionStatus,
+    ValidateExport,
 )
 from snkb.application.services.application_controller import (
     ApplicationController,
@@ -50,7 +57,7 @@ from snkb.modules.navigation.navigation_recorder import NavigationRecorder
 from snkb.modules.screenshots.screenshot_engine import ScreenshotEngine
 from snkb.modules.selectors.selector_analyzer import SelectorAnalyzer
 from snkb.modules.session.session_manager import SessionManager
-from snkb.shared.dtos.app_config import CapturePolicyModel
+from snkb.shared.dtos.app_config import AppConfig, CapturePolicyModel
 
 _INSTANCE_URL = "https://empresa.service-now.com"
 _POLL_TIMEOUT_SECONDS = 2.0
@@ -212,6 +219,44 @@ class _FakeBrowserDataCollector:
             self._call_order.append("collector.stop")
 
 
+class _FakeSessionDiscovery:
+    """Duplo de teste de ``SessionDiscoveryPort`` (ADR 0014) — não toca
+    disco, guarda ``SessionSummary`` fornecidos pelo teste."""
+
+    def __init__(self, summaries: list[SessionSummary] | None = None) -> None:
+        self.summaries = summaries or []
+
+    def list_recent(self, limit: int = 20) -> list[SessionSummary]:
+        return self.summaries[:limit]
+
+    def find(self, session_id: UUID) -> SessionSummary | None:
+        for summary in self.summaries:
+            if summary.session_id == session_id:
+                return summary
+        return None
+
+
+class _FakeFolderOpener:
+    """Duplo de teste de ``FolderOpenerPort`` — só registra chamadas."""
+
+    def __init__(self) -> None:
+        self.opened: list[Path] = []
+
+    def open(self, path: Path) -> None:
+        self.opened.append(path)
+
+
+class _FakeLogReader:
+    """Duplo de teste de ``LogReaderPort`` — devolve registros
+    pré-configurados pelo teste, sem ler arquivos."""
+
+    def __init__(self, records: list[LogRecordSummary] | None = None) -> None:
+        self.records = records or []
+
+    def read_session_logs(self, session_id: UUID, limit: int = 200) -> list[LogRecordSummary]:
+        return self.records[:limit]
+
+
 def _wait_until(predicate: Callable[[], bool], timeout: float = _POLL_TIMEOUT_SECONDS) -> None:
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
@@ -287,6 +332,11 @@ class _Harness:
             self.collectors.append(collector)
             return collector
 
+        self.session_discovery = _FakeSessionDiscovery()
+        self.folder_opener = _FakeFolderOpener()
+        self.log_reader = _FakeLogReader()
+        self.config = AppConfig(instance_url=_INSTANCE_URL, output_directory=tmp_path)
+
         self.controller = ApplicationController(
             session_manager=self.session_manager,
             navigation_recorder=self.navigation_recorder,
@@ -296,6 +346,10 @@ class _Harness:
             export_engine=self.export_engine,
             log_engine=self.log_engine,
             event_bus=self.event_bus,
+            session_discovery=self.session_discovery,  # type: ignore[arg-type]
+            folder_opener=self.folder_opener,  # type: ignore[arg-type]
+            log_reader=self.log_reader,  # type: ignore[arg-type]
+            config=self.config,
             browser_manager_factory=factory,  # type: ignore[arg-type]
             browser_data_collector_factory=collector_factory if with_collector else None,  # type: ignore[arg-type]
             shutdown_timeout_seconds=5.0,
@@ -548,11 +602,88 @@ def test_query_get_navigation_timeline(tmp_path: Path) -> None:
     harness.controller.dispatch(StopCapture(session_id=session_id))
 
 
-def test_query_get_recent_sessions_raises_not_implemented(tmp_path: Path) -> None:
+def test_query_get_recent_sessions_delegates_to_session_discovery(tmp_path: Path) -> None:
+    harness = _make_harness(tmp_path)
+    summary = SessionSummary(
+        session_id=UUID(int=1),
+        status="completed",
+        instance_url=_INSTANCE_URL,
+        export_directory=tmp_path / "1",
+        recording_start=datetime.now(UTC),
+        recording_end=None,
+        total_pages=1,
+        total_elements=2,
+        total_screenshots=3,
+        error_count=0,
+    )
+    harness.session_discovery.summaries = [summary]
+
+    result = harness.controller.query(GetRecentSessions(limit=5))
+
+    assert result == [summary]
+
+
+def test_query_validate_export_delegates_to_export_engine(tmp_path: Path) -> None:
+    harness = _make_harness(tmp_path)
+    session_id = harness.start_and_wait_until_recording()
+    harness.controller.dispatch(StopCapture(session_id=session_id))
+
+    # Exportação falha de forma honesta nesta harness (sem metadados de
+    # navegador) — validate() deve refletir isso, não fabricar sucesso.
+    assert harness.controller.query(ValidateExport(session_id=session_id)) is False
+
+
+def test_query_get_session_logs_delegates_to_log_reader(tmp_path: Path) -> None:
+    harness = _make_harness(tmp_path)
+    record = LogRecordSummary(
+        timestamp=datetime.now(UTC), level="INFO", module="session_manager", message="oi"
+    )
+    harness.log_reader.records = [record]
+
+    result = harness.controller.query(GetSessionLogs(session_id=UUID(int=1)))
+
+    assert result == [record]
+
+
+def test_query_get_effective_configuration_returns_injected_config(tmp_path: Path) -> None:
     harness = _make_harness(tmp_path)
 
-    with pytest.raises(NotImplementedError):
-        harness.controller.query(GetRecentSessions())
+    assert harness.controller.query(GetEffectiveConfiguration()) is harness.config
+
+
+def test_dispatch_open_export_folder_opens_the_discovered_directory(tmp_path: Path) -> None:
+    harness = _make_harness(tmp_path)
+    export_dir = tmp_path / "export"
+    summary = SessionSummary(
+        session_id=UUID(int=1),
+        status="completed",
+        instance_url=_INSTANCE_URL,
+        export_directory=export_dir,
+        recording_start=datetime.now(UTC),
+        recording_end=None,
+        total_pages=0,
+        total_elements=0,
+        total_screenshots=0,
+        error_count=0,
+    )
+    harness.session_discovery.summaries = [summary]
+
+    harness.controller.dispatch(OpenExportFolder(session_id=UUID(int=1)))
+
+    assert harness.folder_opener.opened == [export_dir]
+
+
+def test_dispatch_open_export_folder_publishes_error_when_session_not_found(
+    tmp_path: Path,
+) -> None:
+    harness = _make_harness(tmp_path)
+    received: list[object] = []
+    harness.controller.subscribe(received.append)
+
+    harness.controller.dispatch(OpenExportFolder(session_id=UUID(int=99)))
+
+    assert harness.folder_opener.opened == []
+    assert any(isinstance(event, ErrorOccurred) for event in received)
 
 
 def test_dispatch_unknown_command_raises_not_implemented(tmp_path: Path) -> None:

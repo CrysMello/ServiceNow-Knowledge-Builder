@@ -1,5 +1,3 @@
-"""Reserved for the Configuration Manager adapter
-(``ConfigurationProviderPort``), which will load ``config/default.json``
-(or an equivalent) into ``snkb.shared.dtos.app_config.AppConfig``. Not
-implemented in this scaffolding step.
+"""Configuration Manager adapter (``ConfigurationProviderPort``,
+CFG-001 a CFG-006). Ver ``configuration_manager.py`` e ADR 0015.
 """

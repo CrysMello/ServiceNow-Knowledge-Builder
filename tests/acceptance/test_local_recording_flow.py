@@ -22,6 +22,8 @@ não estiverem instalados, o teste é pulado em vez de falhar.
 from __future__ import annotations
 
 import asyncio
+import json
+import os
 import threading
 import time
 from collections.abc import Iterator
@@ -32,6 +34,7 @@ from typing import cast
 
 import pytest
 from playwright.async_api import Page
+from typer.testing import CliRunner
 
 from snkb.application.services.application_controller import (
     InMemoryEventBus,
@@ -178,7 +181,7 @@ async def _wait_until_async(predicate: object, timeout: float = 5.0) -> None:
 
 
 async def test_local_four_page_recording_flow_exports_real_knowledge_base(
-    tmp_path: Path, local_app_server: str
+    tmp_path: Path, local_app_server: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     login_url = f"{local_app_server}/login.html"
     home_url = f"{local_app_server}/home.html"
@@ -318,5 +321,47 @@ async def test_local_four_page_recording_flow_exports_real_knowledge_base(
         assert screenshot_files
         for screenshot_file in screenshot_files:
             assert screenshot_file.stat().st_size > 0
+
+        # ADR 0014/0015: os 5 comandos restantes da CLI (``status``,
+        # ``validate``, ``open``, ``logs``, ``config``) rodam como
+        # processos separados de ``snkb record`` (cada um via
+        # ``CliRunner``, um processo novo em produção) e devem enxergar
+        # a sessão gravada acima só através do que foi escrito em disco
+        # — sem mais chamar ``announce_pending``.
+        (tmp_path / "config").mkdir()
+        (tmp_path / "config" / "local.json").write_text(
+            json.dumps({"instance_url": login_url, "output_directory": "exports"}),
+            encoding="utf-8",
+        )
+        opened_paths: list[Path] = []
+        monkeypatch.setattr("sys.platform", "win32")
+        monkeypatch.setattr(
+            os, "startfile", lambda path: opened_paths.append(Path(path)), raising=False
+        )
+        monkeypatch.chdir(tmp_path)
+
+        from snkb.presentation.cli.main import app
+
+        runner = CliRunner()
+
+        status_result = runner.invoke(app, ["status"])
+        assert status_result.exit_code == 0
+        assert str(session_id) in status_result.output
+
+        validate_result = runner.invoke(app, ["validate"])
+        assert validate_result.exit_code == 0
+        assert "válida" in validate_result.output.lower()
+
+        open_result = runner.invoke(app, ["open"])
+        assert open_result.exit_code == 0
+        assert len(opened_paths) == 1
+        assert opened_paths[0].resolve() == output_dir.resolve()
+
+        logs_result = runner.invoke(app, ["logs"])
+        assert logs_result.exit_code == 0
+
+        config_result = runner.invoke(app, ["config"])
+        assert config_result.exit_code == 0
+        assert login_url in config_result.output
     finally:
         await browser_manager.close()

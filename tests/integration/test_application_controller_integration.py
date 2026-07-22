@@ -22,7 +22,8 @@ from uuid import UUID
 
 import pytest
 
-from snkb.application.commands.commands import StartCapture, StopCapture
+from snkb.application.commands.commands import OpenExportFolder, StartCapture, StopCapture
+from snkb.application.queries.queries import GetRecentSessions, ValidateExport
 from snkb.application.services.application_controller import (
     ApplicationController,
     InMemoryEventBus,
@@ -33,6 +34,8 @@ from snkb.domain.events.export_events import ExportCompleted, ExportFailed
 from snkb.domain.events.session_events import SessionCreated, SessionStarted
 from snkb.infrastructure.browser.browser_data_collector import BrowserDataCollector
 from snkb.infrastructure.browser.browser_manager import PlaywrightBrowserManager
+from snkb.infrastructure.logging.log_reader import DiskLogReader
+from snkb.infrastructure.storage.session_discovery import DiskSessionDiscovery
 from snkb.modules.elements.element_recorder import ElementRecorder
 from snkb.modules.export.export_engine import ExportEngine
 from snkb.modules.navigation.navigation_recorder import NavigationRecorder
@@ -121,6 +124,19 @@ def _find_event[EventT](events: list[object], event_type: type[EventT]) -> Event
     raise AssertionError(f"Nenhum evento do tipo {event_type.__name__} foi publicado.")
 
 
+class _NoOpFolderOpener:
+    """Duplo de ``FolderOpenerPort`` só para este teste: abrir de verdade
+    o explorador de arquivos do SO durante a suíte automatizada abriria
+    uma janela real — indesejável em CI. ``OsFolderOpener`` em si é
+    coberto por ``tests/unit/infrastructure/storage/test_folder_opener.py``."""
+
+    def __init__(self) -> None:
+        self.opened: list[Path] = []
+
+    def open(self, path: Path) -> None:
+        self.opened.append(path)
+
+
 def test_full_capture_lifecycle_with_real_chromium(tmp_path: Path, local_http_server: str) -> None:
     config = AppConfig(
         instance_url=local_http_server,
@@ -181,6 +197,8 @@ def test_full_capture_lifecycle_with_real_chromium(tmp_path: Path, local_http_se
             config=config,
         )
 
+    folder_opener = _NoOpFolderOpener()
+
     controller = ApplicationController(
         session_manager=session_manager,
         navigation_recorder=navigation_recorder,
@@ -190,6 +208,12 @@ def test_full_capture_lifecycle_with_real_chromium(tmp_path: Path, local_http_se
         export_engine=export_engine,
         log_engine=log_engine,
         event_bus=event_bus,
+        session_discovery=DiskSessionDiscovery(
+            output_directory=config.output_directory, log_engine=log_engine  # type: ignore[arg-type]
+        ),
+        folder_opener=folder_opener,
+        log_reader=DiskLogReader(log_directory=tmp_path / "logs"),
+        config=config,
         browser_manager_factory=browser_manager_factory,
         browser_data_collector_factory=browser_data_collector_factory,
         shutdown_timeout_seconds=15.0,
@@ -240,3 +264,12 @@ def test_full_capture_lifecycle_with_real_chromium(tmp_path: Path, local_http_se
     assert (output_dir / "selectors.json").is_file()
     assert list((output_dir / "pages").glob("*.json"))
     assert list((output_dir / "screenshots").glob("*.png"))
+
+    # ADR 0014: uma vez exportada, a sessão é descobrível em disco por um
+    # processo novo — o mesmo caminho que ``snkb status``/``validate``/
+    # ``open`` usam.
+    recent = controller.query(GetRecentSessions(limit=1))
+    assert recent and recent[0].session_id == session_id
+    assert controller.query(ValidateExport(session_id=session_id)) is True
+    controller.dispatch(OpenExportFolder(session_id=session_id))
+    assert folder_opener.opened == [output_dir]

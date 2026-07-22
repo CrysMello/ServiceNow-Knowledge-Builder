@@ -38,25 +38,24 @@ substituído pela chamada real assim que o módulo listado existir.
 | Element Recorder (6) | `snkb record`: contador "Elementos" reflete elementos reais coletados pelo Browser Data Collector a cada página estável (ADR 0013) | `bootstrap.create_controller` + `infrastructure/browser/browser_data_collector.py` | ☑ |
 | Selector Analyzer (7) | Seletores reais gerados por elemento coletado, disponíveis em `selectors.json` na exportação (ADR 0013) | `infrastructure/browser/browser_data_collector.py` | ☑ |
 | Screenshot Engine (8) | `snkb record`: contador "Screenshots" reflete capturas reais (`page.screenshot()`) após login, navegações e antes do encerramento (ADR 0013) | `infrastructure/browser/browser_data_collector.py` + `InMemoryScreenshotStore` | ☑ |
-| Export Engine (9) | `snkb record`: `ExportCompleted`/`ExportFailed` já tratados pela CLI — a exportação real agora **tem sucesso**, pois o Browser Data Collector coleta os metadados de navegador exigidos (ADR 0013); **`snkb validate`**/**`snkb open`** continuam pendentes (precisam descobrir a sessão mais recente em disco, não apenas ter o Export Engine ligado) | `presentation/cli/commands/validate.py`/`open_folder.py` + descoberta de sessão em disco | ☑ (Export Engine ligado e exportando com sucesso; comandos `validate`/`open` ainda não) |
-| Log Engine (10) | Logging estruturado ativo durante `snkb record`; **`snkb logs`** continua pendente (mesma razão do item acima: precisa ler `logs/` de uma sessão específica, não só ter o Log Engine ligado) | `presentation/cli/commands/logs.py` + descoberta de sessão em disco | ☐ (Log Engine ligado; comando ainda não) |
-| Configuration Manager (SAD, não numerado no Module Specifications) | **`snkb config`** passa a funcionar; recarregamento em tempo de execução e mensagens de erro por campo (CFG-006) | `infrastructure/configuration/` (novo); `presentation/cli/commands/config.py` | ☐ — `bootstrap.py` hoje só tem um carregador mínimo, não uma implementação de `ConfigurationProviderPort` (ver ADR 0012) |
+| Export Engine (9) | `snkb record`: `ExportCompleted`/`ExportFailed` já tratados pela CLI — a exportação real tem sucesso (ADR 0013); **`snkb validate`**/**`snkb open`** também funcionam, via descoberta de sessão em disco (ADR 0014) | `presentation/cli/commands/validate.py`/`open_folder.py` + `infrastructure/storage/session_discovery.py` | ☑ (ver ADR 0013/0014) |
+| Log Engine (10) | Logging estruturado ativo durante `snkb record`; **`snkb logs`** funciona, lendo `logs/snkb_*.log` de uma sessão específica (ADR 0014) | `presentation/cli/commands/logs.py` + `infrastructure/logging/log_reader.py` | ☑ (ver ADR 0014) |
+| Configuration Manager (SAD, não numerado no Module Specifications) | **`snkb config`** funciona; recarregamento em tempo de execução e mensagens de erro por campo (CFG-006) | `infrastructure/configuration/configuration_manager.py`; `presentation/cli/commands/config.py` | ☑ (ver ADR 0015) |
 | Application Controller (nenhum capítulo próprio — é o composition root) | Todos os comandos deixam de propagar `NotImplementedError` de `create_controller`; `RecordCommandHandler.handle_domain_event` é notificado via `ApplicationControllerPort.subscribe()` (decisão do ADR 0003, concluída no ADR 0012) | `bootstrap.py`; `application/services/application_controller.py` (novo); `application/services/application_controller_port.py` (novo método `subscribe`) | ☑ (ver ADR 0012) |
 | Browser Data Collector (sem capítulo próprio — ponte de infraestrutura) | `snkb record`: fecha o pipeline ponta a ponta — elementos, seletores, screenshots e metadados de sessão reais, exportação com sucesso | `infrastructure/browser/browser_data_collector.py` (novo); `application/ports/browser_data_collector_port.py` (novo); `bootstrap.py` | ☑ (ver ADR 0013) |
+| Session Discovery / Folder Opener / Log Reader (sem capítulo próprio — leitura pós-exportação) | `snkb status`/`validate`/`open`/`logs`: descobrem a sessão mais recente em disco e agem sobre ela em um processo novo | `application/ports/session_discovery_port.py`, `folder_opener_port.py`, `log_reader_port.py` (novos); `infrastructure/storage/`, `infrastructure/logging/log_reader.py` (novos) | ☑ (ver ADR 0014) |
 
 Ao concluir a etapa de um módulo, marque a linha correspondente e
 atualize a coluna "Status" da tabela principal acima.
-
-**`snkb status`/`snkb validate`/`snkb open`/`snkb logs` continuam
-chamando `announce_pending`** mesmo com todos os módulos de dados
-implementados e ligados: esses comandos rodam em um processo *novo*,
-sem acesso à memória do processo que gravou a sessão — precisam de um
-mecanismo de descoberta em disco (ler `session.json`/`manifest.json`
-da exportação mais recente), que é uma responsabilidade distinta,
-ainda não implementada (ver ADR 0012, "Consequências").
 
 Desde o ADR 0013, `snkb record` produz uma Base de Conhecimento real e
 completa (elementos, seletores, screenshots e metadados de sessão
 verdadeiros, exportação concluída com sucesso) — confirmado por testes
 de integração com Chromium real e um teste de aceite com um app HTML
 local de quatro páginas.
+
+Desde os ADRs 0014 (Session Discovery/Folder Opener/Log Reader) e 0015
+(Configuration Manager), os cinco comandos que antes chamavam
+`announce_pending` — `status`, `validate`, `open`, `logs`, `config` —
+estão todos implementados. `presentation/cli/handlers/pending.py` foi
+removido: não há mais nenhum comando "casca" no projeto.

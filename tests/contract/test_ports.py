@@ -7,13 +7,17 @@ from __future__ import annotations
 
 from snkb.application.ports.browser_data_collector_port import BrowserDataCollectorPort
 from snkb.application.ports.browser_manager_port import BrowserManagerPort
+from snkb.application.ports.configuration_provider_port import ConfigurationProviderPort
 from snkb.application.ports.element_recorder_port import ElementRecorderPort
 from snkb.application.ports.event_publisher_port import EventPublisherPort
 from snkb.application.ports.export_engine_port import ExportEnginePort
+from snkb.application.ports.folder_opener_port import FolderOpenerPort
 from snkb.application.ports.log_engine_port import LogEnginePort
+from snkb.application.ports.log_reader_port import LogReaderPort
 from snkb.application.ports.navigation_recorder_port import NavigationRecorderPort
 from snkb.application.ports.screenshot_engine_port import ScreenshotEnginePort
 from snkb.application.ports.selector_analyzer_port import SelectorAnalyzerPort
+from snkb.application.ports.session_discovery_port import SessionDiscoveryPort
 from snkb.application.ports.session_manager_port import SessionManagerPort
 from snkb.application.services.application_controller_port import ApplicationControllerPort
 
@@ -152,3 +156,19 @@ def test_browser_data_collector_port_matches_adr_0013() -> None:
         "capture_current_page",
         "stop",
     }
+
+
+def test_session_discovery_port_matches_adr_0014() -> None:
+    assert _public_methods(SessionDiscoveryPort) == {"list_recent", "find"}
+
+
+def test_folder_opener_port_matches_adr_0014() -> None:
+    assert _public_methods(FolderOpenerPort) == {"open"}
+
+
+def test_log_reader_port_matches_adr_0014() -> None:
+    assert _public_methods(LogReaderPort) == {"read_session_logs"}
+
+
+def test_configuration_provider_port_matches_cfg_001_to_cfg_006() -> None:
+    assert _public_methods(ConfigurationProviderPort) == {"load", "reload"}

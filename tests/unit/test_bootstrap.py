@@ -1,7 +1,7 @@
 """``bootstrap.create_controller`` monta um ``ApplicationController``
-real (ADR 0012) a partir de um arquivo de configuração — sem config
-nenhuma, deve falhar de forma controlada, com diagnóstico útil
-(PR-007), nunca silenciosamente."""
+real (ADR 0012) a partir de um arquivo de configuração carregado pelo
+Configuration Manager (ADR 0015) — sem config nenhuma, deve falhar de
+forma controlada, com diagnóstico útil (PR-007), nunca silenciosamente."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 from snkb import bootstrap
+from snkb.domain.exceptions.configuration_exceptions import ConfigurationError
 
 
 def _write_minimal_config(config_dir: Path) -> None:
@@ -20,12 +21,12 @@ def _write_minimal_config(config_dir: Path) -> None:
     )
 
 
-def test_create_controller_without_any_config_file_raises_file_not_found(
+def test_create_controller_without_any_config_file_raises_configuration_error(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.chdir(tmp_path)
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(ConfigurationError):
         bootstrap.create_controller()
 
 

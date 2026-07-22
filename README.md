@@ -25,19 +25,19 @@ do Module Specifications também estão implementados e conectados
 (Browser Manager, Session Manager, Navigation Recorder, Element
 Recorder, Selector Analyzer, Screenshot Engine, Export Engine, Log
 Engine — ADRs 0004–0011), junto com o `ApplicationController`
-(ADR 0012) e o Browser Data Collector (ADR 0013), que fecha o pipeline
-ponta a ponta com dados reais.
+(ADR 0012), o Browser Data Collector (ADR 0013), a descoberta de
+sessão em disco/abertura de pasta/leitura de logs (ADR 0014) e o
+Configuration Manager (ADR 0015).
 
-`snkb record --instance-url ...` já funciona de ponta a ponta: abre um
+`snkb record --instance-url ...` funciona de ponta a ponta: abre um
 Chromium real, aguarda o login manual, rastreia a navegação, coleta
 elementos reais de DOM, gera seletores, captura screenshots e exporta
-uma Base de Conhecimento completa ao encerrar. `snkb --help`,
-`snkb version` e os demais comandos "pendentes" (`status`, `validate`,
-`open`, `logs`, `config`) continuam chamando `announce_pending` — eles
-dependem de um mecanismo de descoberta da sessão mais recente em disco
-(cada invocação da CLI é um processo novo) ou do Configuration
-Manager, nenhum dos dois implementado ainda (ver ADR 0012/0013,
-"Consequências").
+uma Base de Conhecimento completa ao encerrar. Todos os 7 comandos
+estão implementados: `status`, `validate`, `open`, `logs` descobrem a
+sessão mais recente exportada em disco (cada invocação da CLI é um
+processo novo, sem acesso à memória do processo que gravou a sessão)
+e `config` exibe a configuração efetiva carregada pelo Configuration
+Manager.
 
 ## Fonte da verdade
 
@@ -89,11 +89,11 @@ mypy src
 snkb --help              # lista os 7 comandos
 snkb version             # imprime a versão instalada
 snkb record --instance-url https://sua-instancia.service-now.com
-snkb status              # status da sessão (pendente: precisa de descoberta em disco)
-snkb validate             # verificação de integridade da Base de Conhecimento (pendente)
-snkb open                 # abre a pasta de exportação (pendente)
-snkb logs                  # logs da sessão (pendente)
-snkb config                 # configuração efetiva (pendente: precisa do Configuration Manager)
+snkb status              # status e contadores da sessão mais recente exportada
+snkb validate             # verificação de integridade da Base de Conhecimento mais recente
+snkb open                 # abre a pasta de exportação da sessão mais recente
+snkb logs                  # logs persistidos da sessão mais recente
+snkb config                 # configuração efetiva carregada pelo Configuration Manager
 ```
 
 `snkb record` abre o navegador, aguarda o login manual via Microsoft,
@@ -101,9 +101,13 @@ grava a navegação e encerra com segurança ao pressionar `Enter` ou
 `Ctrl+C`, exportando a Base de Conhecimento para
 `exports/<session-id>/`. Ver
 [docs/adr/0003-cli-presentation-layer.md](docs/adr/0003-cli-presentation-layer.md)
-para o fluxo completo de comandos e
+para o fluxo completo de comandos,
 [docs/adr/0013-browser-data-collector.md](docs/adr/0013-browser-data-collector.md)
-para como os dados reais são coletados e exportados.
+para como os dados reais são coletados e exportados, e
+[docs/adr/0014-session-discovery.md](docs/adr/0014-session-discovery.md)/
+[docs/adr/0015-configuration-manager.md](docs/adr/0015-configuration-manager.md)
+para como `status`/`validate`/`open`/`logs`/`config` funcionam a
+partir de um processo novo.
 
 ## Estrutura do repositório
 
@@ -122,8 +126,7 @@ scripts/             ferramentas de desenvolvimento
 ## Roteiro
 
 A camada de apresentação da CLI está concluída (ADR 0003), assim como
-os oito módulos centrais e o Application Controller (ADRs 0004–0012) e
-o Browser Data Collector (ADR 0013), que fecha o pipeline ponta a
-ponta com dados reais. Os próximos passos são os comandos que
-dependem de descoberta de sessão em disco (`status`/`validate`/`open`/
-`logs`) e o Configuration Manager (`config`).
+os oito módulos centrais, o Application Controller (ADRs 0004–0012), o
+Browser Data Collector (ADR 0013), a descoberta de sessão em disco/
+abertura de pasta/leitura de logs (ADR 0014) e o Configuration Manager
+(ADR 0015). Todos os 7 comandos da CLI estão implementados.

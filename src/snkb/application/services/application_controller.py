@@ -25,16 +25,20 @@ from uuid import UUID
 
 from snkb.application.commands.commands import (
     ExitApplication,
+    OpenExportFolder,
     PauseCapture,
     ResumeCapture,
     StartCapture,
     StopCapture,
 )
 from snkb.application.queries.queries import (
+    GetEffectiveConfiguration,
     GetNavigationTimeline,
     GetRecentSessions,
+    GetSessionLogs,
     GetSessionStatistics,
     GetSessionStatus,
+    ValidateExport,
 )
 from snkb.domain.enums.session_status import SessionStatus
 from snkb.domain.events.browser_events import PageChanged
@@ -49,12 +53,16 @@ if TYPE_CHECKING:
     from snkb.application.ports.element_recorder_port import ElementRecorderPort
     from snkb.application.ports.event_publisher_port import EventPublisherPort
     from snkb.application.ports.export_engine_port import ExportEnginePort
+    from snkb.application.ports.folder_opener_port import FolderOpenerPort
     from snkb.application.ports.log_engine_port import LogEnginePort
+    from snkb.application.ports.log_reader_port import LogReaderPort
     from snkb.application.ports.navigation_recorder_port import NavigationRecorderPort
     from snkb.application.ports.screenshot_engine_port import ScreenshotEnginePort
     from snkb.application.ports.selector_analyzer_port import SelectorAnalyzerPort
+    from snkb.application.ports.session_discovery_port import SessionDiscoveryPort
     from snkb.application.ports.session_manager_port import SessionManagerPort
     from snkb.domain.events.base import DomainEvent
+    from snkb.shared.dtos.app_config import AppConfig
 
     class _JoinableThread(Protocol):
         def start(self) -> None: ...
@@ -152,6 +160,10 @@ class ApplicationController:
         export_engine: ExportEnginePort,
         log_engine: LogEnginePort,
         event_bus: InMemoryEventBus,
+        session_discovery: SessionDiscoveryPort,
+        folder_opener: FolderOpenerPort,
+        log_reader: LogReaderPort,
+        config: AppConfig,
         browser_manager_factory: Callable[
             [UUID, EventPublisherPort, LogEnginePort], BrowserManagerPort
         ],
@@ -168,6 +180,10 @@ class ApplicationController:
         self._screenshot_engine = screenshot_engine
         self._export_engine = export_engine
         self._log = log_engine
+        self._session_discovery = session_discovery
+        self._folder_opener = folder_opener
+        self._log_reader = log_reader
+        self._config = config
         self._browser_manager_factory = browser_manager_factory
         self._browser_data_collector_factory = browser_data_collector_factory
         self._thread_factory = thread_factory
@@ -204,6 +220,8 @@ class ApplicationController:
                 self._session_manager.resume_session(session_id)
             case ExitApplication():
                 self._handle_exit_application()
+            case OpenExportFolder(session_id=session_id):
+                self._handle_open_export_folder(session_id)
             case _:
                 raise NotImplementedError(
                     f"Comando ainda não suportado pelo Application Controller: "
@@ -218,12 +236,14 @@ class ApplicationController:
                 return self._build_live_statistics(session_id)
             case GetNavigationTimeline():
                 return self._navigation_recorder.export_navigation().get("timeline", [])
-            case GetRecentSessions():
-                raise NotImplementedError(
-                    "GetRecentSessions depende de um mecanismo de descoberta de "
-                    "sessões persistidas em disco (Configuration Manager/leitura "
-                    "de exports/), ainda não implementado."
-                )
+            case GetRecentSessions(limit=limit):
+                return self._session_discovery.list_recent(limit)
+            case ValidateExport(session_id=session_id):
+                return self._export_engine.validate(session_id)
+            case GetSessionLogs(session_id=session_id, limit=limit):
+                return self._log_reader.read_session_logs(session_id, limit)
+            case GetEffectiveConfiguration():
+                return self._config
             case _:
                 raise NotImplementedError(
                     f"Consulta ainda não suportada pelo Application Controller: "
@@ -371,6 +391,23 @@ class ApplicationController:
     def _handle_exit_application(self) -> None:
         if self._active_session_id is not None:
             self._handle_stop_capture(self._active_session_id)
+
+    # ------------------------------------------------------------------
+    # OpenExportFolder
+    # ------------------------------------------------------------------
+
+    def _handle_open_export_folder(self, session_id: UUID) -> None:
+        summary = self._session_discovery.find(session_id)
+        if summary is None:
+            self._event_bus.publish(
+                ErrorOccurred(
+                    session_id=session_id,
+                    module="ApplicationController",
+                    message=f"Sessão {session_id} não encontrada em disco; nada para abrir.",
+                )
+            )
+            return
+        self._folder_opener.open(summary.export_directory)
 
     # ------------------------------------------------------------------
     # Coordenação entre módulos (assinante interno do barramento)
