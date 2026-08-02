@@ -5,11 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "servicenow-knowledge-builder"
 version = "0.1.0"
-description = "CLI que observa uma sessão autenticada do ServiceNow e produz uma Knowledge Base estruturada e reutilizável para o futuro QA ServiceNow Assistant."
+description = "Plataforma para captura, estruturação e reutilização de conhecimento de navegação do ServiceNow, permitindo registrar fluxos funcionais, identificar elementos da interface e construir uma base de conhecimento reutilizável para automação de testes."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "Proprietary" }
-authors = [{ name = "Crystiane Madeira de Mello" }]
+authors = [{ name = "Crystiane Mello", email = "crystianemello@gmail.com" }]
+maintainers = [{ name = "Crystiane Mello", email = "crystianemello@gmail.com" }]
 
 dependencies = [
     "playwright>=1.45",

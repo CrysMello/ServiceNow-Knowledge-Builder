@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "Se você utilizar este projeto, por favor cite-o conforme os metadados abaixo."
+type: software
+title: "ServiceNow Knowledge Builder"
+abstract: >-
+  Plataforma para captura, estruturação e reutilização de conhecimento
+  de navegação do ServiceNow, permitindo registrar fluxos funcionais,
+  identificar elementos da interface e construir uma base de
+  conhecimento reutilizável para automação de testes.
+authors:
+  - family-names: "Mello"
+    given-names: "Crystiane"
+    email: "crystianemello@gmail.com"
+version: "0.1.0"
+date-released: "2026-08-02"
+license: "Proprietary"
+repository-code: "https://github.com/CrysMello/ServiceNow-Knowledge-Builder"

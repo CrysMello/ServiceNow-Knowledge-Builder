@@ -1,0 +1,18 @@
+ServiceNow Knowledge Builder
+Copyright (c) 2026 Crystiane Mello
+
+Este projeto foi idealizado, arquitetado e é mantido por Crystiane
+Mello, na condição de Creator, Software Architect e Maintainer.
+
+Todas as decisões de arquitetura e engenharia — incluindo, mas não se
+limitando a: escolha de padrões arquiteturais, definição de módulos e
+seus limites de responsabilidade, contratos de interface, garantias de
+segurança e regras de negócio — pertencem à autora.
+
+Modelo de desenvolvimento: Human-directed AI development.
+
+Ferramentas de Inteligência Artificial foram utilizadas exclusivamente
+como apoio à implementação (redação de código, testes e documentação),
+sempre sob direção, revisão e decisão final da autora. O uso dessas
+ferramentas não constitui autoria, coautoria ou cotitularidade sobre o
+projeto, sua arquitetura ou suas decisões de engenharia.

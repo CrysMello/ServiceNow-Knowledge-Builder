@@ -1,10 +1,13 @@
 # ServiceNow Knowledge Builder
 
-Aplicação de linha de comando (`snkb`) que observa uma sessão
-autenticada do ServiceNow e produz uma **Base de Conhecimento**
-estruturada e reutilizável — páginas, elementos, seletores, grafo de
-navegação, screenshots e relatórios — para consumo futuro pelo **QA
-ServiceNow Assistant**.
+Plataforma para captura, estruturação e reutilização de conhecimento
+de navegação do ServiceNow, permitindo registrar fluxos funcionais,
+identificar elementos da interface e construir uma base de
+conhecimento reutilizável para automação de testes. A interface de
+linha de comando (`snkb`) observa uma sessão autenticada do ServiceNow
+e produz essa **Base de Conhecimento** — páginas, elementos,
+seletores, grafo de navegação, screenshots e relatórios — para consumo
+futuro pelo **QA ServiceNow Assistant**.
 
 O Knowledge Builder nunca automatiza ações de negócio do ServiceNow,
 nunca preenche formulários, nunca clica em nome do usuário, e nunca
@@ -12,6 +15,15 @@ automatiza ou armazena credenciais, códigos MFA ou tokens do Microsoft
 Entra ID (SSO). A autenticação é sempre manual. Ver `RS-001` a
 `RS-015` no documento de Regras de Negócio para a lista completa de
 garantias de segurança.
+
+## Autoria
+
+**Crystiane Mello** — Creator · Software Architect · Maintainer
+
+Modelo de desenvolvimento: **Human-directed AI development** — a
+implementação é feita com apoio de ferramentas de IA, sempre sob
+direção, revisão e decisão final da autora. Ver
+[NOTICE](NOTICE) e [AUTHORS.md](AUTHORS.md) para detalhes.
 
 ## Status
 
@@ -122,6 +134,19 @@ logs/                logs de sessão (nunca versionado)
 examples/            exemplos de uso
 scripts/             ferramentas de desenvolvimento
 ```
+
+## Documentação institucional
+
+- [LICENSE](LICENSE) — termos de uso e direitos autorais.
+- [NOTICE](NOTICE) — autoria, arquitetura e modelo de desenvolvimento.
+- [AUTHORS.md](AUTHORS.md) — autoria e papéis.
+- [CONTRIBUTING.md](CONTRIBUTING.md) — como propor mudanças.
+- [SECURITY.md](SECURITY.md) — política de segurança e como reportar
+  vulnerabilidades.
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — código de conduta.
+- [CHANGELOG.md](CHANGELOG.md) — histórico de mudanças.
+- [CITATION.cff](CITATION.cff) — como citar este projeto.
+- [VERSION](VERSION) — versão atual do projeto.
 
 ## Roteiro
 
